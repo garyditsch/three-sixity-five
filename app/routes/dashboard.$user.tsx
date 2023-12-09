@@ -1,4 +1,5 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { useParams } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -6,6 +7,13 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
+
+export async function loader({
+  params,
+}: LoaderFunctionArgs) {
+  console.log(params)
+  return params.user
+}
 
 
 const year: object[] = [];
@@ -19,10 +27,9 @@ for(let i = 0; i < noDays; i++){
   })
 }
 
-console.log(year)
-
-export default function Index() {
-
+export default function Dashboard() {
+  const params = useParams()
+  console.log(params)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -30,7 +37,7 @@ export default function Index() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll bg-slate-200">
         {/* <!-- Container --> */}
         <div className="w-full h-1/6 rounded-lg flex items-center justify-center flex-shrink-0 flex-grow bg-gray-400">
-          One, Two, Three
+          {params.user}
         </div>
         <div className="w-full h-1/6 rounded-lg flex items-center justify-center flex-shrink-0 flex-grow bg-gray-400">
           One, Two, Three
