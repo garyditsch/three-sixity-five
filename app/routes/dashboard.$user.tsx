@@ -11,7 +11,6 @@ export const meta: MetaFunction = () => {
 export async function loader({
   params,
 }: LoaderFunctionArgs) {
-  console.log(params)
   return params.user
 }
 
@@ -29,7 +28,6 @@ for(let i = 0; i < noDays; i++){
 
 export default function Dashboard() {
   const params = useParams()
-  console.log(params)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">

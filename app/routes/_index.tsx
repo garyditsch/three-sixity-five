@@ -1,5 +1,5 @@
-import type { MetaFunction } from "@remix-run/node";
-import { Link } from "@remix-run/react";
+import { Link, useOutletContext, } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,12 +8,23 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
+// export const loader = async ({}: LoaderFunctionArgs) => {
+    
+//     // return { goals: data ?? [] }
+//     return {}
+// }
 
+
+export default function Index() {  
+    // const supabase = useOutletContext();
+    // console.log(supabase)
+    // const { data, error } = supabase.from('contries').select();
+    // console.log(data)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
       <div className="mt-2 w-full z-10">
+        {/* <pre>{JSON.stringify(goals, null, 2)}</pre> */}
         <div className="mt-8 pl-8 mx-auto text-left font-medium text-xl text-blue-500 hover:text-blue-700 hover:bg-blue-50">Log Today</div>
         <ul
             className="mt-8 mx-auto text-left font-medium text-lg leading-none border-blue-200 divide-y divide-blue-200">

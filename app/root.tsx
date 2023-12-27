@@ -1,5 +1,8 @@
-import type { LinksFunction } from "@remix-run/node";
+import { type LinksFunction, type LoaderFunctionArgs } from "@remix-run/node";
+import { createBrowserClient } from "@supabase/ssr";
+
 import {
+  Link,
   Links,
   LiveReload,
   Meta,
@@ -7,6 +10,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
 
@@ -14,7 +18,20 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
+export async function loader({}: LoaderFunctionArgs) {
+  return {
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    },
+  };
+}
+
 export default function App() {
+
+  const { env } = useLoaderData<typeof loader>();
+  const supabase = createBrowserClient(env.SUPABASE_URL!, env.SUPABASE_ANON_KEY!);
+  
   return (
     <html lang="en">
       <head>
@@ -62,13 +79,19 @@ export default function App() {
           <div className="w-full h-full flex flex-col justify-between">
             <header className="h-16 w-full flex items-center relative justify-end px-5 space-x-10 bg-gray-800">
               <div className="flex flex-shrink-0 items-center space-x-4 text-white">
+                <div>
+                  <Link to="/signup">Sign In</Link>
+                    <form method="post" action="/logout" >
+                    <button className="text-gray-200">Logout</button>
+                  </form>
+                </div>
                 <div className="flex flex-col items-end ">
-                  <div className="text-md font-medium ">Gary Ditsch</div>
+                  <div className="text-md font-medium ">GaryTest</div>
                 </div>
                 <div className="h-10 w-10 rounded-full cursor-pointer bg-gray-200 border-2 border-blue-400"></div>
               </div>
             </header>
-            <Outlet />
+            <Outlet context={supabase}/>
           </div>
         </div>
         <ScrollRestoration />

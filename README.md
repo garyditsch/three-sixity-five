@@ -36,3 +36,10 @@ Make sure to deploy the output of `remix build`
 
 - `build/`
 - `public/build/`
+
+## Resources 
+- https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=remix
+- https://www.youtube.com/watch?v=XIj7nmIYtbo
+- https://www.youtube.com/watch?v=Viaed7XWCY8
+- https://www.youtube.com/watch?v=-7K6DRWfEGM
+- https://blog.logrocket.com/remix-supabase-real-time-chat-app/
