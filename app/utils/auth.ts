@@ -1,4 +1,6 @@
-import { createCookie } from "@remix-run/node";
+import { createCookie, redirect } from "@remix-run/node";
+import { createSupabaseServerClient } from "./supabase.server";
+
 
 let secret = process.env.COOKIE_SECRET || "default";
 if(secret === "default") {
@@ -21,3 +23,15 @@ export let authCookie = createCookie("auth", {
 // ) {
 //     return { id: 1}
 // }
+
+export async function readUserSession(request: Request){
+    const { supabase } = await createSupabaseServerClient({request});
+    const result = await supabase.auth.getSession();
+    const user = result.data.session?.user;
+
+    // if (!user) {
+    //     console.log("NO USER!!")
+    //     throw redirect("/login")
+    // }
+    return user;
+}

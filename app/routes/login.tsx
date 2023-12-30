@@ -30,7 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return json({error: error.message }, { headers, status: 401})
     }
 
-    return redirect("/", { headers });
+    return redirect("/add-goals", { headers });
 }
 
 export default function Login() {
@@ -38,6 +38,8 @@ export default function Login() {
     let actionData = useActionData<typeof action>();
     let emailError = actionData?.clientErrors?.email;
     let passwordError = actionData?.clientErrors?.password;
+    // let supabaseError = actionData?.error?;
+    // console.log(supabaseError)
 
 
     return (
@@ -53,6 +55,7 @@ export default function Login() {
                 </div>
                 <div className="sm:mx-auto sm:w-full sm:max-w-[480px]">
                     <div className="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+                    {/* {supabaseError && (<span className="text-red-500">{supabaseError}</span>)} */}
                         <Form method="POST" className="space-y-6">
                             <div>
                                 <label 

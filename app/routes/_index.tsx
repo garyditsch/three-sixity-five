@@ -1,5 +1,5 @@
-import { Link, useOutletContext, } from "@remix-run/react";
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import type {  MetaFunction } from "@remix-run/node";
 
 export const meta: MetaFunction = () => {
   return [
@@ -8,18 +8,9 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-// export const loader = async ({}: LoaderFunctionArgs) => {
-    
-//     // return { goals: data ?? [] }
-//     return {}
-// }
-
 
 export default function Index() {  
-    // const supabase = useOutletContext();
-    // console.log(supabase)
-    // const { data, error } = supabase.from('contries').select();
-    // console.log(data)
+    
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
