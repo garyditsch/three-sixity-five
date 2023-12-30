@@ -43,3 +43,5 @@ Make sure to deploy the output of `remix build`
 - https://www.youtube.com/watch?v=Viaed7XWCY8
 - https://www.youtube.com/watch?v=-7K6DRWfEGM
 - https://blog.logrocket.com/remix-supabase-real-time-chat-app/
+- https://www.youtube.com/watch?v=PdmKlne1gRY
+- Jumped into the Supabase and Remix Discords also

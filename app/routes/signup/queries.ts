@@ -1,6 +1,6 @@
-import { getSupabaseServerClient } from "~/utils/supabase.server";
+// import { createSupabaseServerClient } from "~/utils/supabase.server";
 
-// interact with supabase to see if account already exists
+// // interact with supabase to see if account already exists
 
 export async function accountExists(email: string){
     // let account = // check database to see if account exists
@@ -9,11 +9,11 @@ export async function accountExists(email: string){
     return false;
 }
 
-// interact with supabase to create account
+// // interact with supabase to create account
 
-export async function creatAccount(
-    email: string, 
-    password: string,
-) {
+// export async function createAccount(
+//     email: string, 
+//     password: string,
+// ) {
     
-}
+// }
