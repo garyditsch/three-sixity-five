@@ -9,8 +9,6 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-
-
 export async function loader({request, params}: LoaderFunctionArgs) {
   const { supabase } = await createSupabaseServerClient({request})
   const { data, error } = await supabase
@@ -26,18 +24,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     data: data,
     error: error
   }
-}
-
-
-const year: object[] = [];
-const noDays = 365;
-
-for(let i = 0; i < noDays; i++){
-  year.push({
-    "number": i,
-    "future": false,
-    "complete": true,
-  })
 }
 
 // https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
@@ -68,18 +54,10 @@ const getBehaviorList = (data: Array<any> | null) => {
   return transformedArray;
 }
 
-export default function Dashboard() {
-  const params = useParams();
-  const { data, error } = useLoaderData<typeof loader>();
-  console.log(error)
-
-  const list = getBehaviorList(data)
-  // sorts list based on date object
-  const sortedList = list.sort((a, b) => a.created_at - b.created_at);
-
-  // gets at unique arrary that filters out any repeating days of year for a logged behavior 
-  // not double dipping on logged behaviors!
-  const uniqueDaysList = sortedList.filter((function(){
+// gets at unique arrary that filters out any repeating days of year for a logged behavior 
+// not double dipping on logged behaviors!
+const getUniqueDayList = (list: Array<any>) => {
+  const uniqueDaysList = list.filter((function(){
     const loggedDays = new Set();
     return function(day){
       if (!loggedDays.has(day.day_of_year)){
@@ -89,7 +67,46 @@ export default function Dashboard() {
       return false;
     };
   })());
-  console.log('unique days list', uniqueDaysList)
+
+  return uniqueDaysList
+}
+
+
+const createYearlyCalendar = (list: Array<any>) => {
+  const year: object[] = [];
+  const noDays = 366;
+
+  for(let i = 1; i < noDays; i++){
+    if(list.includes(i)){
+      year.push({
+        "number": i,
+        "future": false,
+        "complete": true
+      })
+    } else {
+      year.push({
+        "number": i,
+        "future": false,
+        "complete": false,
+      })
+    }
+  }
+  return year;
+};
+
+
+
+export default function Dashboard() {
+  const params = useParams();
+  const { data, error } = useLoaderData<typeof loader>();
+  console.log(error)
+
+  const list = getBehaviorList(data)
+  // sorts list based on date object
+  const sortedList = list.sort((a, b) => a.created_at - b.created_at);
+  const completedDayObjectList = getUniqueDayList(sortedList)
+  const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
+  const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -97,13 +114,13 @@ export default function Dashboard() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll bg-slate-200">
         {/* <!-- Container --> */}
         <div className="w-full h-1/6 rounded-lg flex items-center justify-center flex-shrink-0 flex-grow bg-gray-400">
-          <p>{params.user}</p>
+          <p>{params.user}: {completedDayOfYearList.length}</p>
         </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
-          {uniqueDaysList.map((day: any) => {
+          {yearlyCalendar.map((day: any) => {
             return <div className={`w-10 h-10 flex items-center justify-center 
               ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`} key={day.number}>
-            {day.day_of_year}
+            {day.number}
             </div>
           })}
         </div>
