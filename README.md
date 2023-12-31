@@ -1,41 +1,16 @@
-# Welcome to Remix!
+## Introduction to Project
+This is a simple app I have been playing around with in my spare time, as a way to create a production worthy app with the following tech:
 
-- [Remix Docs](https://remix.run/docs)
+- Remix (first time used)
+- Supabase (first time used)
+- Typescript (used in past but never in one of my own projects)
+- Tailwindcss (have used multiple times)
 
-## Development
+## Purpose of the app
+It's a simple daily habit tracker and I will likely add more behavioral economic principles as we go forward, but the general principle is that doing something everyday matters. The discipline of getting stuff done today.
 
-From your terminal:
+The idea is that you select several habits (up to 5) that you want to implement and set a goal for each habit for the year. Those goals need to add up to 365 days, or it can be more if you choose. However, everyday you need to complete at least one of the habits. There is no extra credit for doing multiple habits on a day. The challenge is to complete at least 1 habit, everyday, for 365 days.
 
-```sh
-npm run dev
-```
-
-This starts your app in development mode, rebuilding assets on file changes.
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `remix build`
-
-- `build/`
-- `public/build/`
 
 ## Resources 
 - https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=remix
