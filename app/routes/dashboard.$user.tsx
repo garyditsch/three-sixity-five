@@ -40,27 +40,28 @@ for(let i = 0; i < noDays; i++){
   })
 }
 
-function getDayOfYear(dateString) {
-  const date = new Date(dateString);
-  const startOfYear = new Date(date.getFullYear(), 0, 1);
+// https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
+// link above was solution needed to deal with typescript errors getting time difference
+function getDayOfYear(dateString: Date) {
+  const startOfYear = new Date(dateString.getFullYear(), 0, 1);
   const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  
-  return Math.floor((date - startOfYear) / millisecondsPerDay) + 1;
+  return Math.floor((dateString.getTime() - startOfYear.getTime()) / millisecondsPerDay) + 1;
 }
 
+// function flattens the goal list and logged behavior list, 
+// it also sets up the returned object with the needed data and data types for further processing
 const getBehaviorList = (data: Array<any> | null) => {
   const transformedArray = data.reduce((acc, obj) => {
     // Map each item in the nested array to a new object, including additional properties
     const newObjects = obj.behaviors.map(behavior => ({
       ...obj, // Spread operator to include all properties of the original object
-      created_at: behavior.created_at,
-      day_of_year: getDayOfYear(behavior.created_at),
+      created_at: new Date(behavior.created_at),
+      day_of_year: getDayOfYear(new Date(behavior.created_at)),
       goal_id: behavior.goal_id,
       id: behavior.id,
       user: behavior.user_id,
-      behaviors: undefined // Optionally remove the original 'items' array
+      behaviors: undefined 
     }));
-  
     // Combine these new objects with the accumulator
     return acc.concat(newObjects);
   }, []);
@@ -69,15 +70,26 @@ const getBehaviorList = (data: Array<any> | null) => {
 
 export default function Dashboard() {
   const params = useParams();
-
   const { data, error } = useLoaderData<typeof loader>();
-  console.log('data', data)  
   console.log(error)
 
   const list = getBehaviorList(data)
-  console.log('my list', list)
-  const dateType = list[0].created_at
-  console.log(typeof(dateType))
+  // sorts list based on date object
+  const sortedList = list.sort((a, b) => a.created_at - b.created_at);
+
+  // gets at unique arrary that filters out any repeating days of year for a logged behavior 
+  // not double dipping on logged behaviors!
+  const uniqueDaysList = sortedList.filter((function(){
+    const loggedDays = new Set();
+    return function(day){
+      if (!loggedDays.has(day.day_of_year)){
+        loggedDays.add(day.day_of_year)
+        return true;
+      }
+      return false;
+    };
+  })());
+  console.log('unique days list', uniqueDaysList)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -88,9 +100,10 @@ export default function Dashboard() {
           <p>{params.user}</p>
         </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
-          {year.map((day: any) => {
+          {uniqueDaysList.map((day: any) => {
             return <div className={`w-10 h-10 flex items-center justify-center 
-              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`} key={day.number}>{day.number + 1}
+              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`} key={day.number}>
+            {day.day_of_year}
             </div>
           })}
         </div>
