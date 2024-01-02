@@ -1,5 +1,5 @@
-import { redirect, type ActionFunctionArgs } from "@remix-run/node";
-import { Form, Link, useActionData } from "@remix-run/react"
+import { type ActionFunctionArgs } from "@remix-run/node";
+import { Form, useActionData } from "@remix-run/react"
 
 import { validate } from "./validate";
 // import { creatAccount } from "./queries";
@@ -18,13 +18,6 @@ export async function action({ request }: ActionFunctionArgs) {
         return { errors };
     }
 
-    // let user = await creatAccount(email, password);
-    
-    // return redirect("/", {
-    //     headers: {
-    //         "Set-Cookie": await authCookie.serialize(user.id),
-    //     }
-    // });
     return false;
 }
 

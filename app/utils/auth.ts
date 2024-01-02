@@ -17,12 +17,6 @@ export let authCookie = createCookie("auth", {
     maxAge: 60 * 60 * 24 * 30,
 });
 
-// export async function creatAccount(
-//     email:string, 
-//     password:string,
-// ) {
-//     return { id: 1}
-// }
 
 export async function readUserSession(request: Request){
     const { supabase } = await createSupabaseServerClient({request});

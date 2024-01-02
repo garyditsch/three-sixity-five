@@ -1,5 +1,6 @@
-import { Link, useLoaderData } from "@remix-run/react";
-import type {  MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData, Form, useOutletContext } from "@remix-run/react";
+import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -21,17 +22,42 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     }
   }
 
-  const createGoalList = (data) => {
+  export async function action({ request }: ActionFunctionArgs){
+    const formData = await request.formData();
+    const userId = formData.get("user_id")
+    const goalId = formData.get("goal_id")
+
+    // TODO: create record in supabase function  
+    const { supabase, headers } = await createSupabaseServerClient({request})
+    const { error } = await supabase
+      .from('behaviors')
+      .insert({ user_id: userId, goal_id: goalId })
+    
+    if(error){
+      return json({error: error.message }, { headers, status: 401})
+    }
+
+    return redirect(`/dashboard/${userId}`, { headers });
+  }
+
+  const createGoalList = (data: any, id: string) => {
+    console.log(data)
     const listItems = data.map(( goal: any ) => {
         return <li key={goal.id}>
-                <Link to="#" className="py-3.5 w-full flex items-center text-blue-500 hover:text-blue-700 hover:bg-blue-50">
-                    <span className="ml-5 mr-2.5 w-1 h-7 bg-blue-500 rounded-r-md"></span>
+                <div className="p-3.5 w-full grid grid-cols-2 items-center text-blue-500 hover:text-blue-700">
                     {goal.goal}, {goal.value}
-                </Link>
+                    <div className="grid justify-end">
+                        <Form method="post">
+                            <input type="hidden" name="goal_id" value={goal.id} />
+                            <input type="hidden" name="user_id" value={id} />
+                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
+                        </Form>
+                    </div>
+                </div>
             </li>        
     })
     return (
-        <ul className="mt-8 mx-auto text-left font-medium text-lg leading-none border-blue-200 divide-y divide-blue-200">
+        <ul className="mt-8 mx-auto text-left text-lg leading-none border-blue-200 divide-y divide-blue-200">
             {listItems}
         </ul>
     )
@@ -40,9 +66,10 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 export default function Index() {  
   const { data } = useLoaderData()
-  console.log(data)
+  const id = useOutletContext()
+  console.log('this is my id', id)
 
-  const goals = createGoalList(data)
+  const goals = createGoalList(data, String(id))
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
