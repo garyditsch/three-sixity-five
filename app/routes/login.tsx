@@ -30,7 +30,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return json({error: error.message }, { headers, status: 401})
     }
 
-    return redirect("/add-goals", { headers });
+    return redirect("/", { headers });
 }
 
 export default function Login() {
@@ -38,9 +38,6 @@ export default function Login() {
     let actionData = useActionData<typeof action>();
     let emailError = actionData?.clientErrors?.email;
     let passwordError = actionData?.clientErrors?.password;
-    // let supabaseError = actionData?.error?;
-    // console.log(supabaseError)
-
 
     return (
         <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -85,7 +82,6 @@ export default function Login() {
                                     {passwordError && (<span className="text-red-500">{passwordError}</span>)}
                                 </label>
                                 <input 
-                                    autoFocus 
                                     id="password" 
                                     name="password" 
                                     type="password" 
