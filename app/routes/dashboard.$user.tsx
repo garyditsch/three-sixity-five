@@ -1,5 +1,5 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { useLoaderData, useParams, Link } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -118,10 +118,12 @@ export default function Dashboard() {
         </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
           {yearlyCalendar.map((day: any) => {
-            return <div className={`w-10 h-10 flex items-center justify-center 
-              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`} key={day.number}>
-            {day.number}
+            return <Link to={`/daily/${day.number}`} key={day.number}>
+            <div className={`w-10 h-10 flex items-center justify-center 
+              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`}>
+              {day.number}
             </div>
+            </Link>
           })}
         </div>
     </div>
