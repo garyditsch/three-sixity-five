@@ -41,7 +41,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
   }
 
   const createGoalList = (data: any, id: string) => {
-    console.log(data)
     const listItems = data.map(( goal: any ) => {
         return <li key={goal.id}>
                 <div className="p-3.5 w-full grid grid-cols-2 items-center text-blue-500 hover:text-blue-700">
