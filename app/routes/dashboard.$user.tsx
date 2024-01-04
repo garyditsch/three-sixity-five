@@ -107,6 +107,7 @@ export default function Dashboard() {
   const completedDayObjectList = getUniqueDayList(sortedList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
+  console.log(yearlyCalendar)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -118,7 +119,7 @@ export default function Dashboard() {
         </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
           {yearlyCalendar.map((day: any) => {
-            return <Link to={`/daily/${day.number}`} key={day.number}>
+            return <Link to={`/daily/2024/${day.number}`} key={day.number}>
             <div className={`w-10 h-10 flex items-center justify-center 
               ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`}>
               {day.number}

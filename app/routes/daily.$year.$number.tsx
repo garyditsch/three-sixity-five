@@ -9,11 +9,20 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+const getMonthDayYear = (day: number, year: number) => {
+  const date = new Date(year, 0); // initialize a date in `year-01-01`
+  return new Date(date.setDate(day)); // add the number of days
+}
+
 export async function loader({request, params}: LoaderFunctionArgs) {
+  const selectedDay = getMonthDayYear(Number(params.number), Number(params.year));
+  const stringDate = selectedDay.toISOString().split('T')[0]
+
   const { supabase } = await createSupabaseServerClient({request})
   const { data, error } = await supabase
     .from('behaviors')
     .select()
+    .gte('created_at', stringDate)
 
   return { 
     data: data,
