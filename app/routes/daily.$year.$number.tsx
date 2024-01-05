@@ -16,13 +16,21 @@ const getMonthDayYear = (day: number, year: number) => {
 
 export async function loader({request, params}: LoaderFunctionArgs) {
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year));
+  const nextDay = new Date(selectedDay).setDate(selectedDay.getDate() + 1)
   const stringDate = selectedDay.toISOString().split('T')[0]
+  const nextDayString = new Date(nextDay).toISOString().split('T')[0]
 
   const { supabase } = await createSupabaseServerClient({request})
   const { data, error } = await supabase
     .from('behaviors')
-    .select()
+    .select(`
+      id, goal_id, created_at, user_id,
+      goals (
+        id, goal, value
+      )
+    `)
     .gte('created_at', stringDate)
+    .lt('created_at', nextDayString)
 
   return { 
     data: data,
@@ -41,11 +49,11 @@ function getDayOfYear(dateString: Date) {
 const createBehaviorList = (data: any) => {
     const listItems = data.map(( day: any ) => {
         return <li key={day.id}>
-                {day.created_at}, {day.goal_id}
+                {day.goals.goal}  <span className="text-xs">( xx of {day.goals.value} )</span>
             </li>        
     })
     return (
-        <ul className="mt-8 mx-auto text-left text-lg leading-none border-blue-200 divide-y divide-blue-200">
+        <ul className="mt-8 text-left text-lg border-blue-200 divide-y divide-blue-200">
             {listItems}
         </ul>
     )
@@ -54,7 +62,7 @@ const createBehaviorList = (data: any) => {
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
-  console.log(data)
+  console.log('data return', data)
   console.log(error)
 
   const daysBehaviors = data?.filter((day) => {
@@ -67,9 +75,9 @@ export default function Dashboard() {
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       {/* <!-- Container --> */}
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll bg-slate-200">
+      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         {/* <!-- Container --> */}
-        <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
+        <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
           {createBehaviorList(daysBehaviors)}
         </div>
     </div>
