@@ -112,7 +112,7 @@ export default function Dashboard() {
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       {/* <!-- Container --> */}
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll bg-slate-200">
+      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         {/* <!-- Container --> */}
         <div className="w-full h-1/6 rounded-lg flex items-center justify-center flex-shrink-0 flex-grow bg-gray-400">
           <p>{params.user}: {completedDayOfYearList.length}</p>
@@ -121,7 +121,7 @@ export default function Dashboard() {
           {yearlyCalendar.map((day: any) => {
             return <Link to={`/daily/2024/${day.number}`} key={day.number}>
             <div className={`w-10 h-10 flex items-center justify-center 
-              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-300' : 'bg-red-300'}`}>
+              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-500' : 'bg-red-100'}`}>
               {day.number}
             </div>
             </Link>
