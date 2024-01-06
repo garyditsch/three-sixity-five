@@ -26,7 +26,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     .select(`
       id, goal_id, created_at, user_id,
       goals (
-        id, goal, value
+        id, goal, value, category 
       )
     `)
     .gte('created_at', stringDate)
@@ -46,24 +46,22 @@ function getDayOfYear(dateString: Date) {
     return Math.floor((dateString.getTime() - startOfYear.getTime()) / millisecondsPerDay) + 1;
 }
 
-const createBehaviorList = (data: any) => {
-    const listItems = data.map(( day: any ) => {
-        return <li key={day.id}>
-                {day.goals.goal}  <span className="text-xs">( xx of {day.goals.value} )</span>
-            </li>        
-    })
-    return (
-        <ul className="mt-8 text-left text-lg border-blue-200 divide-y divide-blue-200">
-            {listItems}
-        </ul>
-    )
-  }
+const groupedByCategory = (data: any) => {
+  const x = data.reduce((acc, day) => {
+    (acc[day.goals.category] = acc[day.goals.category] || []).push(day);
+    return acc;
+  }, {});
+  return x;
+}
 
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
   console.log('data return', data)
   console.log(error)
+
+  const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
+  console.log('selectedDay', selectedDay)
 
   const daysBehaviors = data?.filter((day) => {
     const day_of_year = getDayOfYear(new Date(day.created_at))
@@ -72,13 +70,27 @@ export default function Dashboard() {
     }
   })
 
+  const grouped = groupedByCategory(daysBehaviors)
+
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       {/* <!-- Container --> */}
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
-          {createBehaviorList(daysBehaviors)}
+        <div className="text-2xl text-gray-800 border-b-2 border-blue-200">{selectedDay}</div>
+        {Object.keys(grouped).map((key) => (
+                <div key={key}>
+                    <div className="text-2xl font-semibold text-gray-800">{key}</div>
+                    <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
+                        {grouped[key].map((behavior: any) => (
+                            <li key={behavior.id}>
+                            {behavior.goals.goal}  <span className="text-xs">( xx of {behavior.goals.value} )</span>
+                        </li>  
+                        ))}
+                    </ul>
+                </div>
+            ))}
         </div>
     </div>
   </main>
