@@ -57,8 +57,7 @@ const groupedByCategory = (data: any) => {
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
-  console.log('data return', data)
-  console.log(error)
+  console.log('ERROR', error)
 
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
