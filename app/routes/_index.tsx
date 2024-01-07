@@ -14,7 +14,12 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     const { supabase } = await createSupabaseServerClient({request})
     const { data, error } = await supabase
       .from('goals')
-      .select()
+      .select(`
+        id, goal, value, category,
+        behaviors (
+          id, created_at, user_id, goal_id
+        )
+      `)
   
     return { 
       data: data,
@@ -40,17 +45,37 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     return redirect(`/dashboard/${userId}`, { headers });
   }
 
+  // does not account for timezones
+  const loggedToday = (data: any) => {
+    const today = new Date()
+    const todayString = today.toISOString().slice(0, 10)
+    console.log('todayString', todayString)
+    const x = data.filter((day: any) => {
+      const dayString = day.created_at.slice(0, 10)
+      console.log('dayString', dayString)
+      return dayString === todayString
+    })
+    return x
+  }
+
+  const isNotComplete = (data: any) => {
+    const happenedToday = loggedToday(data)
+    // console.log('happenedToday', happenedToday)
+    // console.log('happenedToday length', happenedToday.length === 0)
+    return happenedToday.length === 0
+  }
+
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
         return <li key={goal.id}>
                 <div className="p-3.5 w-full grid grid-cols-2 items-center text-blue-500 hover:text-blue-700">
                     {goal.goal}, {goal.value}
                     <div className="grid justify-end">
-                        <Form method="post">
+                        {isNotComplete(goal.behaviors) ? <Form method="post">
                             <input type="hidden" name="goal_id" value={goal.id} />
                             <input type="hidden" name="user_id" value={id} />
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
-                        </Form>
+                        </Form>: 'Already logged'}
                     </div>
                 </div>
             </li>        
@@ -65,9 +90,8 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 export default function Index() {  
   const { data } = useLoaderData()
+  console.log('data', data)
   const id = useOutletContext()
-  console.log('this is my id', id)
-
   const goals = createGoalList(data, String(id))
 
   return (
