@@ -10,11 +10,21 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+const getMonthDayYear = (day: number, year: number) => {
+  const date = new Date(year, 0); // initialize a date in `year-01-01`
+  return new Date(date.setDate(day)); // add the number of days
+}
+
 export async function loader({request, params}: LoaderFunctionArgs) {
     const { supabase } = await createSupabaseServerClient({request})
     const { data, error } = await supabase
       .from('goals')
-      .select()
+      .select(`
+        id, goal, value, category,
+        behaviors (
+          id, created_at, user_id, goal_id
+        )
+      `)
   
     return { 
       data: data,
@@ -40,18 +50,40 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     return redirect(`/dashboard/${userId}`, { headers });
   }
 
+  const loggedToday = (data: any) => {
+    const today = new Date()
+    const year = today.getFullYear()
+    const day = today.getDate()
+    const selectedDay = getMonthDayYear(day, year);
+    const nextDay = getMonthDayYear(day + 1, year);
+    
+    
+    const x = data.filter((day: any) => {
+        let loggedDate = new Date(day.created_at)
+        return loggedDate >= selectedDay && loggedDate < nextDay
+    })
+    return x
+  }
+
+  const isNotComplete = (data: any) => {
+    const happenedToday = loggedToday(data)
+    return happenedToday.length === 0
+  }
+
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
         return <li key={goal.id}>
                 <div className="p-3.5 w-full grid grid-cols-2 items-center text-blue-500 hover:text-blue-700">
-                    {goal.goal}, {goal.value}
+                    <div>{goal.goal}</div>
                     <div className="grid justify-end">
-                        <Form method="post">
+                        {isNotComplete(goal.behaviors) ? <Form method="post">
                             <input type="hidden" name="goal_id" value={goal.id} />
                             <input type="hidden" name="user_id" value={id} />
                             <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
-                        </Form>
+                        </Form>: 'Already logged'}
                     </div>
+                    <div className="text-xs text-gray-800">( xx of {goal.value} )</div><div></div>
+                    <div className="text-sm text-gray-800">{goal.category}</div><div></div>
                 </div>
             </li>        
     })
@@ -66,8 +98,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 export default function Index() {  
   const { data } = useLoaderData()
   const id = useOutletContext()
-  console.log('this is my id', id)
-
   const goals = createGoalList(data, String(id))
 
   return (

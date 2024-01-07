@@ -99,15 +99,15 @@ const createYearlyCalendar = (list: Array<any>) => {
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
-  console.log(error)
+  console.log('ERROR', error)
 
   const list = getBehaviorList(data)
+  
   // sorts list based on date object
   const sortedList = list.sort((a, b) => a.created_at - b.created_at);
   const completedDayObjectList = getUniqueDayList(sortedList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
-  console.log(yearlyCalendar)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">

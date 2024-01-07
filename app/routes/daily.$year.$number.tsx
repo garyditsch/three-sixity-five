@@ -1,5 +1,5 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, Link } from "@remix-run/react";
+import { useLoaderData, useParams } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -16,9 +16,9 @@ const getMonthDayYear = (day: number, year: number) => {
 
 export async function loader({request, params}: LoaderFunctionArgs) {
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year));
-  const nextDay = new Date(selectedDay).setDate(selectedDay.getDate() + 1)
-  const stringDate = selectedDay.toISOString().split('T')[0]
-  const nextDayString = new Date(nextDay).toISOString().split('T')[0]
+  const nextDay = getMonthDayYear(Number(params.number) + 1, Number(params.year));
+  const stringDate = selectedDay.toISOString()
+  const nextDayString = nextDay.toISOString()
 
   const { supabase } = await createSupabaseServerClient({request})
   const { data, error } = await supabase
@@ -57,11 +57,9 @@ const groupedByCategory = (data: any) => {
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
-  console.log('data return', data)
-  console.log(error)
+  console.log('ERROR', error)
 
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
-  console.log('selectedDay', selectedDay)
 
   const daysBehaviors = data?.filter((day) => {
     const day_of_year = getDayOfYear(new Date(day.created_at))
