@@ -17,7 +17,8 @@ const getMonthDayYear = (day: number, year: number) => {
 
 export async function loader({request, params}: LoaderFunctionArgs) {
     const { supabase } = await createSupabaseServerClient({request})
-    const { data, error } = await supabase
+
+    const { data: goalData, error: goalError } = await supabase
       .from('goals')
       .select(`
         id, goal, value, category,
@@ -25,10 +26,10 @@ export async function loader({request, params}: LoaderFunctionArgs) {
           id, created_at, user_id, goal_id
         )
       `)
-  
+
     return { 
-      data: data,
-      error: error
+      data: goalData,
+      error: goalError, 
     }
   }
 
@@ -97,6 +98,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 export default function Index() {  
   const { data } = useLoaderData()
+  console.log(data)
   const id = useOutletContext()
   const goals = createGoalList(data, String(id))
 
