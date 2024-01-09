@@ -4,22 +4,12 @@ import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "365" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Daily Log" },
+    { name: "description", content: "A look at your daily behavior log" },
   ];
 };
 
-const getMonthDayYear = (day: number, year: number) => {
-  const date = new Date(year, 0); // initialize a date in `year-01-01`
-  return new Date(date.setDate(day)); // add the number of days
-}
-
 export async function loader({request, params}: LoaderFunctionArgs) {
-  const selectedDay = getMonthDayYear(Number(params.number), Number(params.year));
-  const nextDay = getMonthDayYear(Number(params.number) + 1, Number(params.year));
-  const stringDate = selectedDay.toISOString()
-  const nextDayString = nextDay.toISOString()
-
   const { supabase } = await createSupabaseServerClient({request})
   const { data, error } = await supabase
     .from('behaviors')
@@ -29,13 +19,15 @@ export async function loader({request, params}: LoaderFunctionArgs) {
         id, goal, value, category 
       )
     `)
-    .gte('created_at', stringDate)
-    .lt('created_at', nextDayString)
-
   return { 
     data: data,
     error: error
   }
+}
+
+const getMonthDayYear = (day: number, year: number) => {
+  const date = new Date(year, 0); // initialize a date in `year-01-01`
+  return new Date(date.setDate(day)); // add the number of days
 }
 
 // https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
@@ -54,11 +46,25 @@ const groupedByCategory = (data: any) => {
   return x;
 }
 
+const getCounts = (data: any) => {
+  let groupedAndCounts: { [key: string]: number } = {}
+  for(let i = 0; i < data.length; i++) {
+    const goal = data[i].goals.goal
+    if(groupedAndCounts[goal]) {
+      groupedAndCounts[goal] = groupedAndCounts[goal] + 1
+    } else {
+      groupedAndCounts[goal] = 1
+    }
+  }
+  return groupedAndCounts
+}
+
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
 
+  const behaviorCounts =  getCounts(data)
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
   const daysBehaviors = data?.filter((day) => {
@@ -66,6 +72,7 @@ export default function Dashboard() {
     if(String(day_of_year) === params.number){
         return day
     }
+    return null;
   })
 
   const grouped = groupedByCategory(daysBehaviors)
@@ -83,7 +90,7 @@ export default function Dashboard() {
                     <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
                         {grouped[key].map((behavior: any) => (
                             <li key={behavior.id}>
-                            {behavior.goals.goal}  <span className="text-xs">( xx of {behavior.goals.value} )</span>
+                            {behavior.goals.goal}  <span className="text-xs">(  {behaviorCounts[behavior.goals.goal]} of {behavior.goals.value} )</span>
                         </li>  
                         ))}
                     </ul>
