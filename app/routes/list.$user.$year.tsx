@@ -2,7 +2,6 @@ import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Form, useParams, Link } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
-import { useEffect } from "react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -14,8 +13,8 @@ export const meta: MetaFunction = () => {
 export async function loader({request, params}: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const { supabase } = await createSupabaseServerClient({request})
-  const q = url.searchParams.get("q");
-  console.log('Q', q)
+  const category = url.searchParams.get("category");
+  console.log('CATEGORY', category)
   let query = supabase
     .from('behaviors')
     .select(`
@@ -24,16 +23,16 @@ export async function loader({request, params}: LoaderFunctionArgs) {
         id, goal, value, category
       )
     `)
-  if (q) {
+  if (category) {
     query = query
-      .eq('goals.category', q)
+      .eq('goals.category', category)
   }
 
   const { data, error } = await query;
 
   return json({ 
     data: data,
-    q: q,
+    category: category,
     error: error
   })
 }
@@ -44,18 +43,10 @@ export default function YearlyList() {
   console.log('DATA', data)
   console.log('Q', q)
 
-  useEffect(() => {
-    const searchField = document.getElementById("q");
-    if (searchField instanceof HTMLInputElement) {
-      searchField.value = q || "";
-    }
-  }, [q]);
+  const id = useParams().user;
+  console.log('ID', id )
 
   const sortedList = data ? data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : [];
-
-  // data?.map((day: any) => {
-  //   console.log(new Date(day.created_at).toString().split(' ').slice(0, 4).join(' '))
-  // })
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -63,29 +54,12 @@ export default function YearlyList() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-200 justify-items-start"> 
-          <div>Fitness | Spiritual</div>
-          <div>Filtering</div>
-          <div className="py-8">
-              {/* <Form id="Fitness">
-                  <input 
-                    defaultValue={q || ""}
-                    type="hidden" 
-                    name="q" 
-                    value="Fitness"
-                    id="q"
-                  />
-                  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Fitness</button>
-              </Form> */}
-              <Form id="search-form" role="search">
-                <input
-                  aria-label="Search contacts"
-                  defaultValue={q || ""}
-                  id="q"
-                  name="q"
-                  placeholder="Search"
-                  type="search"
-                />
-              </Form>
+          <div className="w-full py-8">
+             <Form className="flex justify-between">
+              <Link to={`/list/${id}/2024`} className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2 text-center">All</Link>
+              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Fitness">Fitness</button>
+              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Spiritual">Spiritual</button>
+             </Form>
           </div>
           {sortedList.map((day: any) => {
             return <div className={"w-full grid grid-cols-1 py-4"} key={day.id}>
