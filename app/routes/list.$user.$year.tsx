@@ -12,9 +12,8 @@ export const meta: MetaFunction = () => {
 
 export async function loader({request, params}: LoaderFunctionArgs) {
   const url = new URL(request.url);
-  const { supabase } = await createSupabaseServerClient({request})
   const category = url.searchParams.get("category");
-  console.log('CATEGORY', category)
+  const { supabase } = await createSupabaseServerClient({request})
   let query = supabase
     .from('behaviors')
     .select(`
@@ -38,13 +37,9 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 }
 
 export default function YearlyList() {
-  const { data, q, error } = useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
-  console.log('DATA', data)
-  console.log('Q', q)
-
   const id = useParams().user;
-  console.log('ID', id )
 
   const sortedList = data ? data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : [];
 

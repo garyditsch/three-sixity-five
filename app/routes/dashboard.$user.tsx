@@ -1,5 +1,6 @@
+import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, Link } from "@remix-run/react";
+import { useLoaderData, useParams, Link, Form } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -10,20 +11,29 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({request, params}: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const category = url.searchParams.get("category");
   const { supabase } = await createSupabaseServerClient({request})
-  const { data, error } = await supabase
-    .from('goals')
+  let query = supabase
+    .from('behaviors')
     .select(`
-      id, goal, value,
-      behaviors (
-        id, created_at, user_id, goal_id
+      id, goal_id, created_at, user_id,
+      goals!inner (
+        id, goal, value, category
       )
     `)
-
-  return { 
-    data: data,
-    error: error
+  if (category) {
+    query = query
+      .eq('goals.category', category)
   }
+
+  const { data, error } = await query;
+
+  return json({ 
+    data: data,
+    category: category,
+    error: error
+  })
 }
 
 // https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
@@ -34,24 +44,18 @@ function getDayOfYear(dateString: Date) {
   return Math.floor((dateString.getTime() - startOfYear.getTime()) / millisecondsPerDay) + 1;
 }
 
-// function flattens the goal list and logged behavior list, 
-// it also sets up the returned object with the needed data and data types for further processing
 const getBehaviorList = (data: Array<any> | null) => {
-  const transformedArray = data.reduce((acc, obj) => {
-    // Map each item in the nested array to a new object, including additional properties
-    const newObjects = obj.behaviors.map(behavior => ({
-      ...obj, // Spread operator to include all properties of the original object
-      created_at: new Date(behavior.created_at),
-      day_of_year: getDayOfYear(new Date(behavior.created_at)),
-      goal_id: behavior.goal_id,
-      id: behavior.id,
-      user: behavior.user_id,
-      behaviors: undefined 
-    }));
-    // Combine these new objects with the accumulator
-    return acc.concat(newObjects);
-  }, []);
-  return transformedArray;
+  const fullList = data?.map((day) => {
+    return {
+      created_at: new Date(day.created_at),
+      day_of_year: getDayOfYear(new Date(day.created_at)),
+      goal_id: day.goals.id,
+      category: day.goals.category,
+      id: day.id,
+      user: day.user_id,
+    }
+  })
+  return fullList;
 }
 
 // gets at unique arrary that filters out any repeating days of year for a logged behavior 
@@ -99,24 +103,29 @@ const createYearlyCalendar = (list: Array<any>) => {
 export default function Dashboard() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
+  console.log('DATA', data)
   console.log('ERROR', error)
 
   const list = getBehaviorList(data)
+  console.log('LIST', list)
   
   // sorts list based on date object
-  const sortedList = list.sort((a, b) => a.created_at - b.created_at);
+  const sortedList = list ? list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) : [];
+
   const completedDayObjectList = getUniqueDayList(sortedList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
-      {/* <!-- Container --> */}
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        {/* <!-- Container --> */}
-        <div className="w-full h-1/6 rounded-lg flex items-center justify-center flex-shrink-0 flex-grow bg-gray-400">
-          <p>{params.user}: {completedDayOfYearList.length}</p>
-        </div>
+        <div className="w-full py-8">
+             <Form className="flex justify-between">
+              <Link to={`/list/${params.id}/2024`} className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2 text-center">All</Link>
+              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Fitness">Fitness</button>
+              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Spiritual">Spiritual</button>
+             </Form>
+          </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
           {yearlyCalendar.map((day: any) => {
             return <Link to={`/daily/2024/${day.number}`} key={day.number}>
