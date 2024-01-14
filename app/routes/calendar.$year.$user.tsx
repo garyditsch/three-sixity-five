@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, Link, Form, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useParams, Link, Form, useSearchParams, useNavigation } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -99,6 +99,10 @@ const createYearlyCalendar = (list: Array<any>) => {
 };
 
 export default function Calendar() {
+  // get navitation state
+  const navigation = useNavigation();
+  console.log('NAVIGATION', navigation)
+
   // get data from loader, log any errors
   const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
@@ -107,6 +111,7 @@ export default function Calendar() {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category')
+  console.log('category params', categoryParam)
 
   // convert data into an array that can be use to create a yearly calendar
   const list = getBehaviorList(data)
@@ -120,24 +125,39 @@ export default function Calendar() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         <div className="w-full py-4">
              <Form className="flex justify-between">
-              <Link to={`/calendar/2024/${params.user}`} 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}  
-              >
-                All
-              </Link>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Fitness">
-                Fitness
-              </button>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Spiritual">
-                Spiritual
-              </button>
+             {navigation.state === 'loading' && navigation.location.search === '' ? <Link to={`/calendar/2024/${params.user}`} 
+                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center bg-gray-800  text-white"
+                >
+                  Loading...
+                </Link>  : <Link to={`/calendar/2024/${params.user}`}  
+                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
+                  'border-solid border-2 border-gray-800'}`}
+                >
+                  All
+                </Link>
+              }
+              {navigation.state === 'loading' && navigation.location.search === '?category=Fitness' ? <button 
+                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800  text-white"
+                  name="category" value="Fitness">
+                  Loading Fitness...
+                </button>  : <button 
+                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
+                  'border-solid border-2 border-gray-800'}`}
+                  name="category" value="Fitness">
+                  Fitness
+                </button>
+              }
+              {navigation.state === 'loading' && navigation.location.search === '?category=Spiritual' ? <button 
+                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800  text-white"
+                  name="category" value="Spiritual">
+                  Loading Spiritual...
+                </button>  : <button 
+                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
+                  'border-solid border-2 border-gray-800'}`}
+                  name="category" value="Spiritual">
+                  Spiritual
+                </button>
+              }
              </Form>
           </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
