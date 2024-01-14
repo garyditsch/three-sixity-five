@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, Link, Form } from "@remix-run/react";
+import { useLoaderData, useParams, Link, Form, useSearchParams } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -10,7 +10,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({request, params}: LoaderFunctionArgs) {
+export async function loader({request}: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const category = url.searchParams.get("category");
   const { supabase } = await createSupabaseServerClient({request})
@@ -98,20 +98,19 @@ const createYearlyCalendar = (list: Array<any>) => {
   return year;
 };
 
-
-
-export default function Dashboard() {
-  const params = useParams();
+export default function Calendar() {
+  // get data from loader, log any errors
   const { data, error } = useLoaderData<typeof loader>();
-  console.log('DATA', data)
   console.log('ERROR', error)
 
-  const list = getBehaviorList(data)
-  console.log('LIST', list)
-  
-  // sorts list based on date object
-  const sortedList = list ? list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) : [];
+  // get params and search params from url
+  const params = useParams();
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category')
 
+  // convert data into an array that can be use to create a yearly calendar
+  const list = getBehaviorList(data)
+  const sortedList = list ? list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) : [];
   const completedDayObjectList = getUniqueDayList(sortedList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
@@ -119,11 +118,26 @@ export default function Dashboard() {
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        <div className="w-full py-8">
+        <div className="w-full py-4">
              <Form className="flex justify-between">
-              <Link to={`/list/${params.id}/2024`} className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2 text-center">All</Link>
-              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Fitness">Fitness</button>
-              <button className="w-1/4 mx-2 rounded-full text-xs font-bold text-white bg-gray-800 py-1 px-2" name="category" value="Spiritual">Spiritual</button>
+              <Link to={`/calendar/2024/${params.user}`} 
+                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
+                'border-solid border-2 border-gray-800'}`}  
+              >
+                All
+              </Link>
+              <button 
+                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
+                'border-solid border-2 border-gray-800'}`}
+                name="category" value="Fitness">
+                Fitness
+              </button>
+              <button 
+                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
+                'border-solid border-2 border-gray-800'}`}
+                name="category" value="Spiritual">
+                Spiritual
+              </button>
              </Form>
           </div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
