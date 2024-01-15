@@ -2,6 +2,7 @@ import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useParams, Link, Form, useSearchParams, useNavigation } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
+import { CategoryFilters } from "~/components/CategoryFilters";
 
 export const meta: MetaFunction = () => {
   return [
@@ -123,43 +124,7 @@ export default function Calendar() {
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        <div className="w-full py-4">
-             <Form className="flex justify-between">
-             {navigation.state === 'loading' && navigation.location.search === '' ? <Link to={`/calendar/2024/${params.user}`} 
-                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center bg-gray-800  text-white"
-                >
-                  Loading...
-                </Link>  : <Link to={`/calendar/2024/${params.user}`}  
-                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
-                  'border-solid border-2 border-gray-800'}`}
-                >
-                  All
-                </Link>
-              }
-              {navigation.state === 'loading' && navigation.location.search === '?category=Fitness' ? <button 
-                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800  text-white"
-                  name="category" value="Fitness">
-                  Loading Fitness...
-                </button>  : <button 
-                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
-                  'border-solid border-2 border-gray-800'}`}
-                  name="category" value="Fitness">
-                  Fitness
-                </button>
-              }
-              {navigation.state === 'loading' && navigation.location.search === '?category=Spiritual' ? <button 
-                  className="w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800  text-white"
-                  name="category" value="Spiritual">
-                  Loading Spiritual...
-                </button>  : <button 
-                  className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
-                  'border-solid border-2 border-gray-800'}`}
-                  name="category" value="Spiritual">
-                  Spiritual
-                </button>
-              }
-             </Form>
-          </div>
+        <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
           {yearlyCalendar.map((day: any) => {
             return <Link to={`/daily/2024/${day.number}`} key={day.number}>
