@@ -48,7 +48,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
       return json({error: error.message }, { headers, status: 401})
     }
 
-    return redirect(`/dashboard/${userId}`, { headers });
+    return redirect(`/calendar/2024/${userId}`, { headers });
   }
 
   const loggedToday = (data: any) => {
