@@ -1,6 +1,7 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, Form, useParams, Link, useSearchParams } from "@remix-run/react";
+import { CategoryFilters } from "~/components/CategoryFilters";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export const meta: MetaFunction = () => {
@@ -55,28 +56,7 @@ export default function YearlyList() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-200 justify-items-start"> 
-          <div className="w-full py-4">
-             <Form className="flex justify-between">
-              <Link to={`/list/2024/${params.user}`} 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}  
-              >
-                All
-              </Link>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Fitness">
-                Fitness
-              </button>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Spiritual">
-                Spiritual
-              </button>
-             </Form>
-          </div>
+          <CategoryFilters categoryParam={categoryParam} params={params} />
           {sortedList.map((day: any) => {
             return <div className={"w-full grid grid-cols-1 py-4"} key={day.id}>
               <div className="text-sm text-gray-800 font-semibold">

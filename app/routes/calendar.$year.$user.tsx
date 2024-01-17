@@ -1,7 +1,8 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, Link, Form, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useParams, Link, Form, useSearchParams, useNavigation } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
+import { CategoryFilters } from "~/components/CategoryFilters";
 
 export const meta: MetaFunction = () => {
   return [
@@ -99,6 +100,10 @@ const createYearlyCalendar = (list: Array<any>) => {
 };
 
 export default function Calendar() {
+  // get navitation state
+  const navigation = useNavigation();
+  console.log('NAVIGATION', navigation)
+
   // get data from loader, log any errors
   const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
@@ -107,6 +112,7 @@ export default function Calendar() {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category')
+  console.log('category params', categoryParam)
 
   // convert data into an array that can be use to create a yearly calendar
   const list = getBehaviorList(data)
@@ -115,37 +121,23 @@ export default function Calendar() {
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const yearlyCalendar = createYearlyCalendar(completedDayOfYearList)
 
+  // get today 
+  const today = getDayOfYear(new Date());
+  console.log('today', today)
+
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        <div className="w-full py-4">
-             <Form className="flex justify-between">
-              <Link to={`/calendar/2024/${params.user}`} 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}  
-              >
-                All
-              </Link>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Fitness' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Fitness">
-                Fitness
-              </button>
-              <button 
-                className={`w-1/4 mx-2 rounded-full text-xs font-bold py-1 px-2 ${categoryParam === 'Spiritual' ? 'bg-gray-800  text-white': 
-                'border-solid border-2 border-gray-800'}`}
-                name="category" value="Spiritual">
-                Spiritual
-              </button>
-             </Form>
-          </div>
+        <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
+        <div className="mx-4 text-lg font-bold">Today is day {today} of the year.</div>
         <div className="w-full h-100 rounded-lg grid grid-cols-7 justify-items-center gap-4"> 
           {yearlyCalendar.map((day: any) => {
             return <Link to={`/daily/2024/${day.number}`} key={day.number}>
-            <div className={`w-10 h-10 flex items-center justify-center 
-              ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-500' : 'bg-red-100'}`}>
-              {day.number}
+            <div className={`${today === day.number ? 'border-solid border-2 border-indigo-600' : ''}`} >
+              <div className={`w-10 h-10 flex items-center justify-center 
+                ${day.future ? 'bg-gray-200' : !day.future && day.complete ? 'bg-green-500' : 'bg-red-100'}`}>
+                {day.number}
+              </div>
             </div>
             </Link>
           })}
