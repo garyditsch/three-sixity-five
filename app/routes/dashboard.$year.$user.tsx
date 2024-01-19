@@ -108,13 +108,20 @@ export default function Dashboard() {
                     <div className="text-lg font-semibold text-gray-800">Total Count is {behaviorCountsByCategory[key]}</div>
                     <div className="text-lg font-semibold">Today is day {today} of the year.</div>
                     <div className="text-lg font-semibold">You have missed {today - behaviorCountsByCategory[key]} days this year.</div>
-                    <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
-                        {grouped[key].map((behavior: any, index: number) => (                                
-                            <li key={behavior.id}>
-                              {behaviorCountsByGoal[behavior.goals.goal]} of {behavior.goals.value} <span className="text-xs">(  {behavior.goals.goal}   )</span>
-                            </li>  
+                    <div className="text-left text-lg text-gray-800">
+                        {grouped[key].map((behavior: any, index: number) => (
+                            <div className="mt-8" key={behavior.id}>
+                              <div>{behavior.goals.goal}</div>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-blue-700">{behaviorCountsByGoal[behavior.goals.goal]} days ({((behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100).toFixed(0)}%)</span>
+                                <span className="text-sm font-medium text-blue-700">{behavior.goals.value} days</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${(behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100}%`}}></div>
+                              </div>    
+                            </div>                            
                         ))}
-                    </ul>
+                    </div>
                 </div>
             ))}
         </div>
