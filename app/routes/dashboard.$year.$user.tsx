@@ -96,6 +96,7 @@ export default function Dashboard() {
    const today = getDayOfYear(new Date());
    console.log('today', today)
 
+
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       {/* <!-- Container --> */}
@@ -103,18 +104,39 @@ export default function Dashboard() {
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
         {Object.keys(grouped).map((key) => (
-                <div key={key}>
-                    <div className="text-2xl font-semibold text-gray-800">{key}</div>
-                    <div className="text-lg font-semibold text-gray-800">Total Count is {behaviorCountsByCategory[key]}</div>
-                    <div className="text-lg font-semibold">Today is day {today} of the year.</div>
-                    <div className="text-lg font-semibold">You have missed {today - behaviorCountsByCategory[key]} days this year.</div>
-                    <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
-                        {grouped[key].map((behavior: any, index: number) => (                                
-                            <li key={behavior.id}>
-                              {behaviorCountsByGoal[behavior.goals.goal]} of {behavior.goals.value} <span className="text-xs">(  {behavior.goals.goal}   )</span>
-                            </li>  
+                <div key={key} className="mt-4">
+                    <div className="flex flex-col bg-white border rounded-md overflow-hidden shadow">
+                        <div className="text-left text-xl text-white p-4 bg-gray-800">
+                          {key}
+                        </div>
+                        <div className="flex">
+                          <div className="py-2 px-4 text-gray-700">
+                              <h3 className="text-sm tracking-wider">Success</h3>
+                              <p className="text-3xl">{behaviorCountsByCategory[key]}</p>
+                          </div>
+                          <div className="py-2 px-4 text-gray-700">
+                              <h3 className="text-sm tracking-wider">Missed</h3>
+                              <p className="text-3xl">{today - behaviorCountsByCategory[key]}</p>
+                          </div>
+                          <div className="flex w-full justify-end items-end p-2">
+                            <div className="text-xs text-right items-end">There are {366 - today} days left in 2024.</div>
+                          </div>
+                        </div>
+                    </div>
+                    <div className="text-left text-lg text-gray-800">
+                        {grouped[key].map((behavior: any, index: number) => (
+                            <div className="mt-8" key={behavior.id}>
+                              <div>{behavior.goals.goal}</div>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-blue-700">{behaviorCountsByGoal[behavior.goals.goal]} days ({((behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100).toFixed(0)}%)</span>
+                                <span className="text-sm font-medium text-blue-700">{behavior.goals.value} days</span>
+                              </div>
+                              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${(behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100}%`}}></div>
+                              </div>    
+                            </div>                            
                         ))}
-                    </ul>
+                    </div>
                 </div>
             ))}
         </div>
