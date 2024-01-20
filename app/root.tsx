@@ -72,7 +72,7 @@ export default function App() {
           <aside className="h-full w-16 pt-16 flex flex-col space-y-10 items-center justify-start relative bg-gray-800 text-white">
             
             {/* Icons https://flowbite.com/icons/  */}
-            {/* <!-- Goals --> */}
+            {/* <!-- Goal Logger --> */}
             <div className="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white  hover:duration-300 hover:ease-linear focus:bg-white">
               <NavLink
                 to="/"
@@ -83,7 +83,7 @@ export default function App() {
               </NavLink>
             </div>
 
-            {/* <!-- Yearly Calendar --> */}
+            {/* <!-- Calendar --> */}
             {id === '' ? <div></div> : <div className="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white  hover:duration-300 hover:ease-linear focus:bg-white">
               <NavLink
                 to={`/calendar/2024/${id}`}
@@ -94,7 +94,7 @@ export default function App() {
               </NavLink>
             </div>}
 
-            {/* <!-- list --> */}
+            {/* <!-- List --> */}
             {id === '' ? <div></div> : <div className="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white  hover:duration-300 hover:ease-linear focus:bg-white">
               <NavLink
                 to={`/list/2024/${id}`}
@@ -102,6 +102,17 @@ export default function App() {
               <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 10">
                 <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="M6 1h10M6 5h10M6 9h10M1.49 1h.01m-.01 4h.01m-.01 4h.01"/>
               </svg>
+              </NavLink>
+            </div>}
+
+            {/* <!-- Dashboard --> */}
+            {id === '' ? <div></div> : <div className="h-10 w-10 flex items-center justify-center rounded-lg cursor-pointer hover:text-gray-800 hover:bg-white  hover:duration-300 hover:ease-linear focus:bg-white">
+              <NavLink
+                to={`/dashboard/2024/${id}`}
+              >
+                <svg className="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 16">
+                  <path stroke="currentColor" strokeLinecap="round" stroke-linejoin="round" strokeWidth="2" d="M1 1v14h16M4 10l3-4 4 4 5-5m0 0h-3.207M16 5v3.207"/>
+                </svg>
               </NavLink>
             </div>}
 

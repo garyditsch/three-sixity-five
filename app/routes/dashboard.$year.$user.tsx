@@ -96,6 +96,7 @@ export default function Dashboard() {
    const today = getDayOfYear(new Date());
    console.log('today', today)
 
+
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
       {/* <!-- Container --> */}
@@ -103,11 +104,25 @@ export default function Dashboard() {
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
         {Object.keys(grouped).map((key) => (
-                <div key={key}>
-                    <div className="text-2xl font-semibold text-gray-800">{key}</div>
-                    <div className="text-lg font-semibold text-gray-800">Total Count is {behaviorCountsByCategory[key]}</div>
-                    <div className="text-lg font-semibold">Today is day {today} of the year.</div>
-                    <div className="text-lg font-semibold">You have missed {today - behaviorCountsByCategory[key]} days this year.</div>
+                <div key={key} className="mt-4">
+                    <div className="flex flex-col bg-white border rounded-md overflow-hidden shadow">
+                        <div className="text-left text-xl text-white p-4 bg-gray-800">
+                          {key}
+                        </div>
+                        <div className="flex">
+                          <div className="py-2 px-4 text-gray-700">
+                              <h3 className="text-sm tracking-wider">Success</h3>
+                              <p className="text-3xl">{behaviorCountsByCategory[key]}</p>
+                          </div>
+                          <div className="py-2 px-4 text-gray-700">
+                              <h3 className="text-sm tracking-wider">Missed</h3>
+                              <p className="text-3xl">{today - behaviorCountsByCategory[key]}</p>
+                          </div>
+                          <div className="flex w-full justify-end items-end p-2">
+                            <div className="text-xs text-right items-end">There are {366 - today} days left in 2024.</div>
+                          </div>
+                        </div>
+                    </div>
                     <div className="text-left text-lg text-gray-800">
                         {grouped[key].map((behavior: any, index: number) => (
                             <div className="mt-8" key={behavior.id}>
