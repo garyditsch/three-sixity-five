@@ -3,11 +3,13 @@ import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useParams, Link, Form, useSearchParams, useNavigation } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { CategoryFilters } from "~/components/CategoryFilters";
+import { getDayOfYear } from "~/utils/date-helper";
+import { getUniqueDayList, getBehaviorList } from "~/utils/data-parsers";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "365" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Calendar" },
+    { name: "description", content: "A calendar review of your daily completed behaviors." },
   ];
 };
 
@@ -37,46 +39,6 @@ export async function loader({request}: LoaderFunctionArgs) {
   })
 }
 
-// https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
-// link above was solution needed to deal with typescript errors getting time difference
-function getDayOfYear(dateString: Date) {
-  const startOfYear = new Date(dateString.getFullYear(), 0, 1);
-  const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  return Math.floor((dateString.getTime() - startOfYear.getTime()) / millisecondsPerDay) + 1;
-}
-
-const getBehaviorList = (data: Array<any> | null) => {
-  const fullList = data?.map((day) => {
-    return {
-      created_at: new Date(day.created_at),
-      day_of_year: getDayOfYear(new Date(day.created_at)),
-      goal_id: day.goals.id,
-      category: day.goals.category,
-      id: day.id,
-      user: day.user_id,
-    }
-  })
-  return fullList;
-}
-
-// gets at unique arrary that filters out any repeating days of year for a logged behavior 
-// not double dipping on logged behaviors!
-const getUniqueDayList = (list: Array<any>) => {
-  const uniqueDaysList = list.filter((function(){
-    const loggedDays = new Set();
-    return function(day){
-      if (!loggedDays.has(day.day_of_year)){
-        loggedDays.add(day.day_of_year)
-        return true;
-      }
-      return false;
-    };
-  })());
-
-  return uniqueDaysList
-}
-
-
 const createYearlyCalendar = (list: Array<any>) => {
   const year: object[] = [];
   const noDays = 366;
@@ -102,7 +64,6 @@ const createYearlyCalendar = (list: Array<any>) => {
 export default function Calendar() {
   // get navitation state
   const navigation = useNavigation();
-  console.log('NAVIGATION', navigation)
 
   // get data from loader, log any errors
   const { data, error } = useLoaderData<typeof loader>();
@@ -112,7 +73,6 @@ export default function Calendar() {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category')
-  console.log('category params', categoryParam)
 
   // convert data into an array that can be use to create a yearly calendar
   const list = getBehaviorList(data)
@@ -123,7 +83,6 @@ export default function Calendar() {
 
   // get today 
   const today = getDayOfYear(new Date());
-  console.log('today', today)
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
