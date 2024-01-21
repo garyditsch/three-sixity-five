@@ -1,11 +1,13 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
+import { getDayOfYear } from "~/utils/date-helper";
+import { getUniqueGoalList, getCountsByGoal, getCountsByCategory, groupedByCategory } from "~/utils/data-parsers";
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Daily Log" },
-    { name: "description", content: "A look at your daily behavior log" },
+    { title: "Dashboard" },
+    { name: "description", content: "A look at your behavior dashboard" },
   ];
 };
 
@@ -25,77 +27,20 @@ export async function loader({request, params}: LoaderFunctionArgs) {
   }
 }
 
-// https://stackoverflow.com/questions/36560806/the-left-hand-side-of-an-arithmetic-operation-must-be-of-type-any-number-or
-// link above was solution needed to deal with typescript errors getting time difference
-function getDayOfYear(dateString: Date) {
-  const startOfYear = new Date(dateString.getFullYear(), 0, 1);
-  const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  return Math.floor((dateString.getTime() - startOfYear.getTime()) / millisecondsPerDay) + 1;
-}
-
-const groupedByCategory = (data: any) => {
-  const x = data.reduce((acc, day) => {
-    (acc[day.goals.category] = acc[day.goals.category] || []).push(day);
-    return acc;
-  }, {});
-  return x;
-}
-
-const getCountsByGoal = (data: any) => {
-  let groupedAndCounts: { [key: string]: number } = {}
-  for(let i = 0; i < data.length; i++) {
-    const goal = data[i].goals.goal
-    if(groupedAndCounts[goal]) {
-      groupedAndCounts[goal] = groupedAndCounts[goal] + 1
-    } else {
-      groupedAndCounts[goal] = 1
-    }
-  }
-  return groupedAndCounts
-}
-
-const getCountsByCategory = (data: any) => {
-  let groupedAndCounts: { [key: string]: number } = {}
-  for(let i = 0; i < data.length; i++) {
-    const category = data[i].goals.category
-    if(groupedAndCounts[category]) {
-      groupedAndCounts[category] = groupedAndCounts[category] + 1
-    } else {
-      groupedAndCounts[category] = 1
-    }
-  }
-  return groupedAndCounts
-}
-
-const getUniqueGoalList = (data: any) => {
-  const uniqueGoalList = new Map();
-  return data.filter(item => {
-    return uniqueGoalList.has(item.goal_id) ? false : uniqueGoalList.set(item.goal_id, true);
-  });
-};
-
 export default function Dashboard() {
   const { data, error } = useLoaderData<typeof loader>();
-  console.log('DATA', data)
   console.log('ERROR', error)
 
   const behaviorCountsByGoal =  getCountsByGoal(data)
   const behaviorCountsByCategory =  getCountsByCategory(data)
-
-  console.log('BEHAVIOR COUNTS', behaviorCountsByCategory)
-
   const grouped = groupedByCategory(data)
 
   Object.keys((grouped)).forEach((key) => {
     grouped[key] = getUniqueGoalList(grouped[key])
   });
 
-  console.log('GROUPED', grouped)
-
-   // get today 
-   const today = getDayOfYear(new Date());
-   console.log('today', today)
-
+  // get today
+  const today = getDayOfYear(new Date());
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
