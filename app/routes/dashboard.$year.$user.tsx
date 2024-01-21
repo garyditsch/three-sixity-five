@@ -1,8 +1,8 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueGoalList, getCountsByGoal, getCountsByCategory, groupedByCategory } from "~/utils/data-parsers";
+import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 
 export const meta: MetaFunction = () => {
   return [
@@ -11,16 +11,10 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({request, params}: LoaderFunctionArgs) {
-  const { supabase } = await createSupabaseServerClient({request})
-  const { data, error } = await supabase
-    .from('behaviors')
-    .select(`
-      id, goal_id, created_at, user_id,
-      goals (
-        id, goal, value, category 
-      )
-    `)
+export async function loader({request}: LoaderFunctionArgs) {
+  let category = null;
+  const { data, error } = await behaviorDataQuery(request, category);
+
   return { 
     data: data,
     error: error

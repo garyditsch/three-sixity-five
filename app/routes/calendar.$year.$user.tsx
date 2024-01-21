@@ -1,10 +1,10 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import { useLoaderData, useParams, Link, Form, useSearchParams, useNavigation } from "@remix-run/react";
-import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList } from "~/utils/data-parsers";
+import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,21 +16,7 @@ export const meta: MetaFunction = () => {
 export async function loader({request}: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const category = url.searchParams.get("category");
-  const { supabase } = await createSupabaseServerClient({request})
-  let query = supabase
-    .from('behaviors')
-    .select(`
-      id, goal_id, created_at, user_id,
-      goals!inner (
-        id, goal, value, category
-      )
-    `)
-  if (category) {
-    query = query
-      .eq('goals.category', category)
-  }
-
-  const { data, error } = await query;
+  const { data, error } = await behaviorDataQuery(request, category);
 
   return json({ 
     data: data,
