@@ -41,7 +41,7 @@ export default function Calendar() {
 
   // convert data into an array that can be use to create a yearly calendar
   const list = getBehaviorList(data)
-  const sortedList = list ? list.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()) : [];
+  const sortedList = list ? list.sort((a, b) => new Date(a.activity_date).getTime() - new Date(b.activity_date).getTime()) : [];
   const completedDayObjectList = getUniqueDayList(sortedList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const calendarData = createYearlyCalendar(completedDayOfYearList)
@@ -54,7 +54,7 @@ export default function Calendar() {
       <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
         <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
         <div className="mx-4 text-lg font-bold">Today is day {today} of this year.</div>
-        <YearlyCalendar yearlyCalendar={calendarData} today={today} />
+        <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
       </div>
     </main>
   );

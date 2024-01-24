@@ -29,14 +29,18 @@ export default function DailyView() {
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
   const todaysBehaviors = data?.filter((day) => {
-    const day_of_year = getDayOfYear(new Date(day.created_at))
+    const day_of_year = getDayOfYear(new Date(day.activity_date))
     if(String(day_of_year) === params.number){
         return day
     }
     return null;
   })
 
+  console.log(params)
+
   const grouped = groupedByCategory(todaysBehaviors)
+
+  console.log('This is the daily view')
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">

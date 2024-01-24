@@ -60,7 +60,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     
     
     const x = data.filter((day: any) => {
-        let loggedDate = new Date(day.created_at)
+        let loggedDate = new Date(day.activity_date)
         return loggedDate >= selectedDay && loggedDate < nextDay
     })
     return x

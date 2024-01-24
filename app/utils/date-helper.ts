@@ -22,3 +22,16 @@ export const getMonthDayYear = (day: number, year: number) => {
   const date = new Date(year, 0); // initialize a date in `year-01-01`
   return new Date(date.setDate(day)); // add the number of days
 }
+
+// getMonthDayYearTime function does the same as getMonthDayYear but adds the time
+export const getMonthDayYearTime = (day: number, year: number) => {
+  const date = new Date(year, 0); // initialize a date in `year-01-01`
+  const targetDate = new Date(date.setDate(day)); // add the number of days
+
+  const now = new Date(); // get the current date and time
+
+  // set the hours, minutes, seconds, and milliseconds of targetDate to the current time
+  targetDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+
+  return targetDate;
+}
