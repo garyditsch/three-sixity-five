@@ -1,6 +1,9 @@
 import { Form, Link } from "@remix-run/react";
 import type { Navigation, Params } from "@remix-run/react";
 
+// Future Enchancement is to make it scrollable like Airbnb category filters
+// https://youtu.be/c_-b_isI4vg?si=aRq6FnNHE4bP_mJN&t=9882
+
 export function CategoryFilters({
   navigation,
   categoryParam,
