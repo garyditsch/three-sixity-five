@@ -32,7 +32,8 @@ export async function action({ request, params }: ActionFunctionArgs){
 
 export async function loader({request}: LoaderFunctionArgs) {
   let category = null;
-  const { data, error } = await behaviorDataQuery(request, category);
+  let goaldId = null;
+  const { data, error } = await behaviorDataQuery(request, category, goaldId);
   const { goalData, errorMsg } = await goalDataQuery(request);
 
   return {
@@ -53,7 +54,7 @@ export default function DailyEdit() {
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
   const todaysBehaviors = data?.filter((day) => {
-    const day_of_year = getDayOfYear(new Date(day.created_at))
+    const day_of_year = getDayOfYear(new Date(day.activity_date))
     if(String(day_of_year) === params.number){
         return day
     }
