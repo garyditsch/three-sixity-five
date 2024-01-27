@@ -34,7 +34,7 @@ export default function Signup() {
                       id="signup-header"
                       className="mt-6 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
                     >
-                        Sign Up
+                        Sign Up Here
                     </h2>
                 </div>
                 <div className="sm:mx-auto sm:w-full sm:max-w-[480px]">
