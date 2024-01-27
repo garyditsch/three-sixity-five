@@ -23,7 +23,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
       .select(`
         id, goal, value, category,
         behaviors (
-          id, created_at, user_id, goal_id
+          id, created_at, user_id, goal_id, activity_date
         )
       `)
 
@@ -56,11 +56,15 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     const year = today.getFullYear()
     const day = today.getDate()
     const selectedDay = getMonthDayYear(day, year);
+    console.log('selected day', selectedDay)
     const nextDay = getMonthDayYear(day + 1, year);
+    console.log('next day', nextDay)
     
     
     const x = data.filter((day: any) => {
         let loggedDate = new Date(day.activity_date)
+        console.log('logged date', loggedDate)
+        console.log(loggedDate >= selectedDay && loggedDate < nextDay)
         return loggedDate >= selectedDay && loggedDate < nextDay
     })
     return x
@@ -68,6 +72,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
   const isNotComplete = (data: any) => {
     const happenedToday = loggedToday(data)
+    console.log('happened today', happenedToday)
     return happenedToday.length === 0
   }
 

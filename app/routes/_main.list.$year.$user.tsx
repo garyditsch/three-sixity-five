@@ -34,7 +34,7 @@ export default function YearlyList() {
   const categoryParam = searchParams.get('category')
   
   // convert data to array to use for UI
-  const sortedList = data ? data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) : [];
+  const sortedList = data ? data.sort((a, b) => new Date(b.activity_date).getTime() - new Date(a.activity_date).getTime()) : [];
 
   return (
     <main className="max-w-full h-full flex relative overflow-y-hidden">
@@ -46,7 +46,7 @@ export default function YearlyList() {
           {sortedList.map((day: any) => {
             return <div className={"w-full grid grid-cols-1 py-4"} key={day.id}>
               <div className="text-sm text-gray-800 font-semibold">
-                {new Date(day.created_at).toString().split(' ').slice(1, 4).join(' ')}
+                {new Date(day.activity_date).toString().split(' ').slice(1, 4).join(' ')}
               </div>
               <div className="text-md text-gray-800">{day.goals.goal}</div>
             </div>

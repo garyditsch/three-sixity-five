@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
-export const behaviorDataQuery = async (request: Request, category: string | null) => {
+export const behaviorDataQuery = async (request: Request, category: string | null, goalId: number | null) => {
     const { supabase } = await createSupabaseServerClient({request})
     let query = supabase
         .from('behaviors')
@@ -13,6 +13,10 @@ export const behaviorDataQuery = async (request: Request, category: string | nul
     if (category) {
         query = query
         .eq('goals.category', category)
+    }
+    if (goalId) { 
+        query = query
+        .eq('goals.id', goalId)
     }
     const { data, error } = await query;
     return { 
