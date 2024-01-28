@@ -9,7 +9,7 @@ export default function MainLayout() {
         <>
             <Header />
             <Nav />
-            <main className="bg-blue-200 p-4">
+            <main className="bg-gray-200 px-4">
               <Outlet context={id} />
             </main>
         </>
