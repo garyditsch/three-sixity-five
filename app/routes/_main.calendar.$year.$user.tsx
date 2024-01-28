@@ -1,6 +1,6 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, useSearchParams, useNavigation, Form, Link } from "@remix-run/react";
+import { useLoaderData, useParams, useSearchParams, useNavigation, Form, Link, Outlet } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
 import { getDayOfYear } from "~/utils/date-helper";
@@ -49,37 +49,22 @@ export default function Calendar() {
   const list = getBehaviorList(data)
   const sortedList = list ? list.sort((a, b) => new Date(a.activity_date).getTime() - new Date(b.activity_date).getTime()) : [];
   const completedDayObjectList = getUniqueDayList(sortedList)
-  console.log('COMPLETED DAY OBJECT LIST', completedDayObjectList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
   const calendarData = createYearlyCalendar(completedDayOfYearList)
-  console.log('CALENDAR DATA', calendarData)
 
   // get today 
   const today = getDayOfYear(new Date());
 
-
+  // create goal options
   const goalOptions = goalData?.map((goal) => {
-    console.log(goal)
     return <option key={goal.id} value={goal.id}>{goal.goal}</option>
-  })
+  }) || null;
 
   return (
     <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
-      <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-800 justify-items-start"> 
+      <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
         <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
-          {/* <div>
-            <div className="text-2xl text-gray-800">Log another behavior on this day.</div>
-            <Link to="modal">Goal Filter</Link>
-            <Form>
-              <select id="goalId" name="goalId">
-                {goalOptions}
-              </select>
-              <div>
-                <button type="submit">Submit</button>
-              </div>
-            </Form>
-          </div>
-          <div className="mx-4 text-lg font-bold">Today is day {today} of this year.</div> */}
+        <div className="text-lg font-bold">Today is day {today} of this year.</div>
         <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
       </div>
     </div>

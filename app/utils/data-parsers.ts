@@ -62,8 +62,6 @@ const getBehaviorListReturn = [
     },
 ]
 
-console.log('Get Behavior List Return: ', getBehaviorListReturn)
-
 // DASHBOARD SCREEN FUNCTIONS
 
 
@@ -150,9 +148,6 @@ const behaviorFilteredQueryReturn = [
         }
     }
 ]
-    
-
-console.log('Dashboard Screen Loader Query', behaviorFilteredQueryReturn)
 
 const finalGroupedOutput = {
     "Fitness": [
@@ -185,8 +180,6 @@ const finalGroupedOutput = {
     ]
 }
 
-console.log('Final Grouped Output', finalGroupedOutput)
-
 const behaviorCountsByGoalReturn = {
     "Full body strength session": 5,
     "Daily Bible Reading": 20,
@@ -195,14 +188,10 @@ const behaviorCountsByGoalReturn = {
     "Walk 10k": 1
 }
 
-console.log('Behavior Counts By Goal Return', behaviorCountsByGoalReturn)
-
 const behaviorCountsByCategoryReturn = {
     "Fitness": 17,
     "Spiritual": 20
 }
-
-console.log('Behavior Counts By Category Return', behaviorCountsByCategoryReturn)
 
 const groupedByCategoryReturn = { 
     "Fitness": [
@@ -247,14 +236,10 @@ const groupedByCategoryReturn = {
     ]
 }
 
-console.log('Grouped By Category Return', groupedByCategoryReturn)
-
-
 export const createYearlyCalendar = (list: Array<any>) => {
   const year: object[] = [];
   let currentYear = new Date().getFullYear();
   const noDays = getDaysInYear(Number(currentYear));
-  console.log(noDays)
 
   for(let i = 1; i < noDays + 1; i++){
     if(list.includes(i)){

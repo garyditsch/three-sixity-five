@@ -63,7 +63,6 @@ export default function DailyEdit() {
   const grouped = groupedByCategory(todaysBehaviors)
 
   const goalOptions = goalData?.map((goal) => {
-    console.log(goal)
     return <option key={goal.id} value={goal.id}>{goal.goal}</option>
   })
 
