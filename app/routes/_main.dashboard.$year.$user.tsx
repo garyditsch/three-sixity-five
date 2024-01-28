@@ -13,7 +13,8 @@ export const meta: MetaFunction = () => {
 
 export async function loader({request}: LoaderFunctionArgs) {
   let category = null;
-  const { data, error } = await behaviorDataQuery(request, category);
+  let goalId = null;
+  const { data, error } = await behaviorDataQuery(request, category, Number(goalId));
 
   return { 
     data: data,
@@ -37,11 +38,8 @@ export default function Dashboard() {
   const today = getDayOfYear(new Date());
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden">
-      {/* <!-- Container --> */}
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        {/* <!-- Container --> */}
-        <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
+    <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
+        <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4 pb-8"> 
         {Object.keys(grouped).map((key) => (
                 <div key={key} className="mt-4">
                     <div className="flex flex-col bg-white border rounded-md overflow-hidden shadow">
@@ -49,11 +47,11 @@ export default function Dashboard() {
                           {key}
                         </div>
                         <div className="flex">
-                          <div className="py-2 px-4 text-gray-700">
+                          <div className="py-2 px-4 text-gray-800">
                               <h3 className="text-sm tracking-wider">Success</h3>
                               <p className="text-3xl">{behaviorCountsByCategory[key]}</p>
                           </div>
-                          <div className="py-2 px-4 text-gray-700">
+                          <div className="py-2 px-4 text-gray-800">
                               <h3 className="text-sm tracking-wider">Missed</h3>
                               <p className="text-3xl">{today - behaviorCountsByCategory[key]}</p>
                           </div>
@@ -67,11 +65,11 @@ export default function Dashboard() {
                             <div className="mt-8" key={behavior.id}>
                               <div>{behavior.goals.goal}</div>
                               <div className="flex justify-between mb-1">
-                                <span className="text-sm font-medium text-blue-700">{behaviorCountsByGoal[behavior.goals.goal]} days ({((behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100).toFixed(0)}%)</span>
-                                <span className="text-sm font-medium text-blue-700">{behavior.goals.value} days</span>
+                                <span className="text-sm font-medium text-gray-800">{behaviorCountsByGoal[behavior.goals.goal]} days ({((behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100).toFixed(0)}%)</span>
+                                <span className="text-sm font-medium text-gray-800">{behavior.goals.value} days</span>
                               </div>
                               <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                                <div className="bg-blue-600 h-2.5 rounded-full" style={{width: `${(behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100}%`}}></div>
+                                <div className="bg-gray-800 h-2.5 rounded-full" style={{width: `${(behaviorCountsByGoal[behavior.goals.goal] / behavior.goals.value) * 100}%`}}></div>
                               </div>    
                             </div>                            
                         ))}
@@ -80,6 +78,5 @@ export default function Dashboard() {
             ))}
         </div>
     </div>
-  </main>
   );
 }

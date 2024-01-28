@@ -64,24 +64,24 @@ export default function Calendar() {
   })
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden">
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
+    <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
+      <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-800 justify-items-start"> 
         <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
-        <div>
-        <div className="text-2xl text-gray-800">Log another behavior on this day.</div>
-          <Link to="modal">Goal Filter</Link>
-          <Form>
-            <select id="goalId" name="goalId">
-              {goalOptions}
-            </select>
-            <div>
-              <button type="submit">Submit</button>
-            </div>
-          </Form>
-        </div>
-        <div className="mx-4 text-lg font-bold">Today is day {today} of this year.</div>
+          {/* <div>
+            <div className="text-2xl text-gray-800">Log another behavior on this day.</div>
+            <Link to="modal">Goal Filter</Link>
+            <Form>
+              <select id="goalId" name="goalId">
+                {goalOptions}
+              </select>
+              <div>
+                <button type="submit">Submit</button>
+              </div>
+            </Form>
+          </div>
+          <div className="mx-4 text-lg font-bold">Today is day {today} of this year.</div> */}
         <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
-        </div>
-    </main>
-  );
+      </div>
+    </div>
+    );
 }

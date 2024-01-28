@@ -13,7 +13,8 @@ export const meta: MetaFunction = () => {
 
 export async function loader({request, params}: LoaderFunctionArgs) {
   let category = null;
-  const { data, error } = await behaviorDataQuery(request, category);
+  let goalId = null;
+  const { data, error } = await behaviorDataQuery(request, category, Number(goalId));
   return { 
     data: data,
     error: error
@@ -43,24 +44,20 @@ export default function DailyView() {
   console.log('This is the daily view')
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden">
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
-        <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4"> 
-        <div className="text-2xl text-gray-800 border-b-2 border-blue-200">{selectedDay}</div>
+    <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
+        <div className="mt-4 text-2xl text-gray-800 border-b-2 border-gray-800">{selectedDay}</div>
         {Object.keys(grouped).map((key) => (
-                <div key={key}>
-                    <div className="text-2xl font-semibold text-gray-800">{key}</div>
-                    <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
-                        {grouped[key].map((behavior: any) => (
-                            <li key={behavior.id}>
-                            {behavior.goals.goal}  <span className="text-xs">(  {behaviorCounts[behavior.goals.goal]} of {behavior.goals.value} )</span>
-                        </li>  
-                        ))}
-                    </ul>
-                </div>
-            ))}
-        </div>
+          <div key={key} className="py-4">
+            <div className="text-2xl font-semibold text-gray-800">{key}</div>
+            <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
+              {grouped[key].map((behavior: any) => (
+                <li key={behavior.id}>
+                  {behavior.goals.goal}  <span className="text-xs">(  {behaviorCounts[behavior.goals.goal]} of {behavior.goals.value} )</span>
+                </li>  
+              ))}
+            </ul>
+          </div>
+        ))}
     </div>
-  </main>
   );
 }
