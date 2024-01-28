@@ -9,8 +9,10 @@ export default function MainLayout() {
         <>
             <Header />
             <Nav />
-            <main className="bg-gray-200 px-4">
-              <Outlet context={id} />
+            <main className="grid justify-items-center bg-gray-200 px-4">
+                <div className="max-w-lg">
+                    <Outlet context={id} />
+                </div>
             </main>
         </>
     )

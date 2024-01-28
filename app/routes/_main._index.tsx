@@ -56,15 +56,10 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     const year = today.getFullYear()
     const day = today.getDate()
     const selectedDay = getMonthDayYear(day, year);
-    console.log('selected day', selectedDay)
-    const nextDay = getMonthDayYear(day + 1, year);
-    console.log('next day', nextDay)
-    
+    const nextDay = getMonthDayYear(day + 1, year);    
     
     const x = data.filter((day: any) => {
         let loggedDate = new Date(day.activity_date)
-        console.log('logged date', loggedDate)
-        console.log(loggedDate >= selectedDay && loggedDate < nextDay)
         return loggedDate >= selectedDay && loggedDate < nextDay
     })
     return x
@@ -72,23 +67,21 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
   const isNotComplete = (data: any) => {
     const happenedToday = loggedToday(data)
-    console.log('happened today', happenedToday)
     return happenedToday.length === 0
   }
 
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
         return <li key={goal.id}>
-                <div className="p-3.5 w-full grid grid-cols-2 items-center text-blue-500 hover:text-blue-700">
+                <div className="p-3.5 w-full grid grid-cols-2 items-center text-gray-800">
                     <div>{goal.goal}</div>
                     <div className="grid justify-end">
                         {isNotComplete(goal.behaviors) ? <Form method="post">
                             <input type="hidden" name="goal_id" value={goal.id} />
                             <input type="hidden" name="user_id" value={id} />
-                            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
+                            <button className="bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
                         </Form>: 'Already logged'}
                     </div>
-                    <div className="text-xs text-gray-800">( xx of {goal.value} )</div><div></div>
                     <div className="text-sm text-gray-800">{goal.category}</div><div></div>
                 </div>
             </li>        
@@ -103,16 +96,13 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 export default function Index() {  
   const { data } = useLoaderData()
-  console.log(data)
   const id = useOutletContext()
   const goals = createGoalList(data, String(id))
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
-      <div className="mt-2 w-full z-10">
-        <div className="mt-8 pl-8 mx-auto text-left font-medium text-xl text-blue-500 hover:text-blue-700 hover:bg-blue-50">Log Today</div>
-        {goals}
+    <div className="mt-2 w-full z-10">
+      <div className="mt-8 text-center font-medium text-xl text-gray-800">Log your activity today.</div>
+      {goals}
     </div>
-  </main>
   );
 }

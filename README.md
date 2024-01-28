@@ -20,3 +20,5 @@ The idea is that you select several habits (up to 5) that you want to implement 
 - https://blog.logrocket.com/remix-supabase-real-time-chat-app/
 - https://www.youtube.com/watch?v=PdmKlne1gRY
 - Jumped into the Supabase and Remix Discords also
+- https://github.com/remix-run/remix/discussions/7296
+-- very helpful post to help me get remix routes with layouts figured out

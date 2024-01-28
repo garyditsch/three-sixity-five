@@ -1,4 +1,4 @@
-import { accountExists } from "./queries";
+import { accountExists } from "../queries/account-check";
 
 export async function validate(email: string, password: string) {
     let errors: { email?: string; password?: string } = {};

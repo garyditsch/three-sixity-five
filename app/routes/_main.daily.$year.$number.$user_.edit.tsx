@@ -1,6 +1,6 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { useParams, useLoaderData, Form, useOutletContext } from "@remix-run/react";
+import { useParams, useLoaderData, Form  } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getMonthDayYear, getMonthDayYearTime, getDayOfYear } from "~/utils/date-helper";
 import { groupedByCategory } from "~/utils/data-parsers";
@@ -46,7 +46,6 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export default function DailyEdit() {
   const { data, error, goalData, errorMsg } = useLoaderData<typeof loader>();
-  const id  = useOutletContext()
   console.log('ERROR', error)
   console.log('ERROR MSG', errorMsg)
   let params = useParams()
@@ -69,11 +68,10 @@ export default function DailyEdit() {
   })
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
-      <div className="bg-yellow-500 w-full">
-      <div className="text-2xl text-gray-800 border-b-2 border-blue-200">{selectedDay}</div>       
+    <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
+      <div className="mt-4 text-2xl text-gray-800 border-b-2 border-gray-800">{selectedDay}</div>
         {Object.keys(grouped).map((key) => (
-            <div key={key}>
+            <div key={key} className="py-4">
                 <div className="text-2xl font-semibold text-gray-800">{key}</div>
                 <ul className="text-left text-lg text-gray-800 border-blue-200 divide-y divide-blue-200">
                     {grouped[key].map((behavior: any) => (
@@ -85,7 +83,7 @@ export default function DailyEdit() {
             </div>
         ))}
         <div className="mt-8">
-          <div className="text-2xl text-gray-800">Log another behavior on this day.</div>
+          <div className="mb-4 text-2xl text-gray-800">Log another behavior for this day.</div>
           <Form method="post">
             <select id="goal" name="goal">
               {goalOptions}
@@ -96,6 +94,5 @@ export default function DailyEdit() {
           </Form>
         </div>
       </div>
-  </main>
   );
 }
