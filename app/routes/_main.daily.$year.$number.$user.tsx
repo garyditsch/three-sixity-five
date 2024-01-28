@@ -36,12 +36,7 @@ export default function DailyView() {
     }
     return null;
   })
-
-  console.log(params)
-
   const grouped = groupedByCategory(todaysBehaviors)
-
-  console.log('This is the daily view')
 
   return (
     <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
