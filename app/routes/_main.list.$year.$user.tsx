@@ -37,9 +37,7 @@ export default function YearlyList() {
   const sortedList = data ? data.sort((a, b) => new Date(b.activity_date).getTime() - new Date(a.activity_date).getTime()) : [];
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden">
-      {/* <!-- Container --> */}
-      <div className="h-100 w-full m-4 flex flex-wrap items-start justify-start rounded-tl grid-flow-col auto-cols-auto gap-4 overflow-y-scroll">
+      <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-200 justify-items-start"> 
           <CategoryFilters categoryParam={categoryParam} params={params} />
@@ -53,6 +51,5 @@ export default function YearlyList() {
           })}
         </div>
     </div>
-  </main>
   );
 }

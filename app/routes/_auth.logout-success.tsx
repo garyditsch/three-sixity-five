@@ -11,8 +11,6 @@ export default function Index() {
 
 
   return (
-    <main className="max-w-full h-full flex relative overflow-y-hidden bg-slate-100">
-      <div className="w-full text-center mt-8">Logout Successful</div>
-  </main>
+      <div className="text-center font-bold text-xl">Logout Successful</div>
   );
 }

@@ -25,13 +25,13 @@ export async function loader({request}: LoaderFunctionArgs) {
 export default function App() {
   return (
     <html lang="en">
-      <head>
+      <head className="h-screen">
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="h-screen grid grid-rows-layout">
         <Outlet />
         <ScrollRestoration />
         <Scripts />
