@@ -27,7 +27,7 @@ export function CategoryFilters({
             All Cat
           </Link>
         }
-        <Link to={`/calendar/2024/${params.user}/goal-filters`} className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800 text-white text-center`}>
+        <Link to={`/calendar/2024/${params.user}/goal-filters`} className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-500 text-white text-center`}>
           <button>By Goal</button>
         </Link>
         {navigation?.state === 'loading' && navigation.location.search === '?category=Fitness' ? <button 

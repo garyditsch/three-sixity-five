@@ -38,12 +38,13 @@ export default function CalendarGoalFilters() {
     console.log('GOAL OPTIONS', goalOptions)
     return (
         <div className="w-full pt-2">
-            <Form method="post" className="grid grid-cols-2" >
-                <select id="goalId" name="goalId">
+            <Form method="post" className="grid" >
+                <label htmlFor="goal" className="my-2 block text-lg font-medium text-gray-800">Filter by a specific goal.</label>
+                <select id="goalId" name="goalId" className="w-full border-gray-400 rounded-lg shadow-sm mb-4">
                 {goalOptions}
                 </select>
-                <div className="grid justify-items-center">
-                <button type="submit">Run</button>
+                <div>
+                    <button className="w-full p-2 bg-gray-800 text-white text-center rounded-md" type="submit">Filter</button>
                 </div>
             </Form>  
         </div>
