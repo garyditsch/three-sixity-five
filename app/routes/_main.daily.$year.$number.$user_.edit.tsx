@@ -81,17 +81,19 @@ export default function DailyEdit() {
                 </ul>
             </div>
         ))}
-        <div className="mt-8">
-          <div className="mb-4 text-2xl text-gray-800">Log another behavior for this day.</div>
+        <div className="mt-8 bg-white py-8 px-6 rounded-lg shadow">
           <Form method="post">
-            <select id="goal" name="goal">
-              {goalOptions}
-            </select>
-            <div>
-              <button type="submit">Submit</button>
+            <label htmlFor="goal" className="mb-2 block text-sm font-medium text-gray-800">Log a new behavior for this day</label>
+            <div className="mt-1">
+              <select id="goal" name="goal" className="w-full border-gray-400 rounded-lg shadow-sm">
+                {goalOptions}
+              </select>
+            </div>
+            <div className="mt-4">
+              <button className="w-full p-2 bg-gray-800 text-white text-center rounded-md" type="submit">Submit</button>
             </div>
           </Form>
         </div>
-      </div>
+    </div>
   );
 }
