@@ -1,6 +1,10 @@
-import { Link } from "@remix-run/react";
+import { Link, useOutlet, useOutletContext } from "@remix-run/react";
 
-let id = '5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0'
+type OutletContext = {
+    user: {
+        id: string;
+    }
+}
 
 const LogInHeader = () => {
     return (
@@ -22,7 +26,10 @@ const LogInHeader = () => {
      )
   }
 
-export function Header() {
+export const Header = () => {
+    let { user } = useOutletContext() as OutletContext;
+    console.log('USER IN HEADER', user);
+    let id = user ? user.id : '';
     return (
         <div className="w-full h-full flex flex-col justify-between bg-red-200">
             <header className="h-16 w-full flex items-center relative justify-end px-5 space-x-10 bg-gray-800">

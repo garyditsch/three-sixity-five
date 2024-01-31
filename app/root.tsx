@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData
 } from "@remix-run/react";
 import stylesheet from "~/tailwind.css";
 
@@ -17,12 +18,14 @@ export const links: LinksFunction = () => [
 
 export async function loader({request}: LoaderFunctionArgs) {
   let user = await readUserSession(request)
+  console.log('USER IN ROOT', user);
   return {
     user
   }
 }
 
 export default function App() {
+  const user = useLoaderData<typeof loader>();
   return (
     <html lang="en">
       <head className="h-screen">
@@ -32,7 +35,7 @@ export default function App() {
         <Links />
       </head>
       <body className="h-screen grid grid-rows-layout">
-        <Outlet />
+        <Outlet context={user} />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
