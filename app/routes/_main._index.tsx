@@ -2,6 +2,7 @@ import { useLoaderData, Form, useOutletContext } from "@remix-run/react";
 import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
+import { getDayOfYear } from "~/utils/date-helper";
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,11 +11,8 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-const getMonthDayYear = (day: number, year: number) => {
-  const date = new Date(year, 0); // initialize a date in `year-01-01`
-  return new Date(date.setDate(day)); // add the number of days
-}
 
+// the action here does not need activity date because db defaults to now(), unlike the daily edit logger which requires the date
 export async function loader({request, params}: LoaderFunctionArgs) {
     const { supabase } = await createSupabaseServerClient({request})
 
@@ -53,17 +51,16 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
   const loggedToday = (data: any) => {
     const today = new Date()
-    const year = today.getFullYear()
-    const day = today.getDate()
-    const selectedDay = getMonthDayYear(day, year);
-    const nextDay = getMonthDayYear(day + 1, year);    
+    let selectedDay = getDayOfYear(today)
     
     const x = data.filter((day: any) => {
         let loggedDate = new Date(day.activity_date)
-        return loggedDate >= selectedDay && loggedDate < nextDay
+        let updatedLoggedDate = getDayOfYear(loggedDate)
+        return updatedLoggedDate === selectedDay
     })
     return x
   }
+
 
   const isNotComplete = (data: any) => {
     const happenedToday = loggedToday(data)

@@ -13,6 +13,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+// the action here has to take in the activity date so it can log it on the correct day (unlike the daily logger)
 export async function action({ request, params }: ActionFunctionArgs){
   const formData = await request.formData();
   const selected_goal = formData.get("goal")
