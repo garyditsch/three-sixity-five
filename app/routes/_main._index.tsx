@@ -4,6 +4,8 @@ import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 
+import type { User } from "~/utils/types";
+
 export const meta: MetaFunction = () => {
   return [
     { title: "365 | Home" },
@@ -93,8 +95,9 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 export default function Index() {  
   const { data } = useLoaderData()
-  const id = useOutletContext()
-  const goals = createGoalList(data, String(id))
+  const user = useOutletContext() as User;
+  console.log('ID IN INDEX', user);
+  const goals = createGoalList(data, String(user.user.id))
 
   return (
     <div className="mt-2 w-full z-10">
