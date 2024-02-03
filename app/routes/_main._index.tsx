@@ -1,4 +1,4 @@
-import { useLoaderData, Form, useOutletContext } from "@remix-run/react";
+import { useLoaderData, Form, useOutletContext, Link } from "@remix-run/react";
 import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
@@ -100,9 +100,14 @@ export default function Index() {
   const goals = createGoalList(data, String(user.user.id))
 
   return (
-    <div className="mt-2 w-full z-10">
-      <div className="mt-8 text-center font-medium text-xl text-gray-800">Log your activity today.</div>
-      {goals}
-    </div>
+    <>
+      <div className="mt-2 w-full z-10">
+        <div className="mt-8 text-center font-medium text-xl text-gray-800">Log your activity today.</div>
+        {goals}
+      </div>
+      <div className="py-8">
+          <Link className="w-full p-2 bg-gray-800 text-white text-center rounded-md" to="/edit">Add Goal</Link>
+        </div>
+    </>
   );
 }
