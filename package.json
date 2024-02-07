@@ -10,19 +10,21 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@remix-run/css-bundle": "^2.3.1",
-    "@remix-run/node": "^2.3.1",
-    "@remix-run/react": "^2.3.1",
-    "@remix-run/serve": "^2.3.1",
+    "@remix-run/css-bundle": "^2.4.1",
+    "@remix-run/node": "^2.4.1",
+    "@remix-run/react": "^2.4.1",
+    "@remix-run/serve": "^2.4.1",
     "@supabase/ssr": "^0.0.10",
     "@supabase/supabase-js": "^2.39.0",
     "isbot": "^3.6.8",
+    "localforage": "^1.10.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "remix-client-cache": "^1.0.1"
   },
   "devDependencies": {
-    "@remix-run/dev": "^2.3.1",
-    "@remix-run/eslint-config": "^2.3.1",
+    "@remix-run/dev": "^2.4.1",
+    "@remix-run/eslint-config": "^2.4.1",
     "@tailwindcss/forms": "^0.5.7",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",

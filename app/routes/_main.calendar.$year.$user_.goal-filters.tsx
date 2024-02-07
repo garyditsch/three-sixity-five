@@ -4,10 +4,8 @@ import { Form, useLoaderData,  } from "@remix-run/react";
 import { goalDataQuery } from "~/queries/behaviors-filtered";
 
 export async function action({ request, params }: ActionFunctionArgs){
-    console.log('PARAMS', params)
     const formData = await request.formData();
     const goalId = formData.get("goalId")
-    console.log('GOAL ID', goalId)
     
     if(goalId){
         throw redirect(`/calendar/2024/${params.user}?goalId=${goalId}`);
@@ -31,11 +29,9 @@ export default function CalendarGoalFilters() {
 
     // create goal options
     const goalOptions = goalData?.map((goal) => {
-        console.log(goal)
         return <option key={goal.id} value={goal.id}>{goal.goal}</option>
     }) || null;
 
-    console.log('GOAL OPTIONS', goalOptions)
     return (
         <div className="w-full pt-2">
             <Form method="post" className="grid" >

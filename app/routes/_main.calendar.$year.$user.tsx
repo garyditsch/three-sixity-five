@@ -1,11 +1,13 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData, useParams, useSearchParams, useNavigation, Form, Link, Outlet } from "@remix-run/react";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
+import { useLoaderData, useParams, useSearchParams, useNavigation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
-import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
+import { behaviorDataQuery } from "~/queries/behaviors-filtered";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,16 +21,23 @@ export async function loader({request}: LoaderFunctionArgs) {
   const category = url.searchParams.get("category");
   const goalId = url.searchParams.get("goalId");
   const { data, error } = await behaviorDataQuery(request, category, Number(goalId));
-  const { goalData, errorMsg } = await goalDataQuery(request);
 
   return json({ 
     data: data,
-    goalData: goalData,
-    errorMsg: errorMsg,
     category: category,
     goalId: goalId,
     error: error
-  })
+  });
+}
+
+export async function clientLoader({ params, serverLoader }: ClientLoaderFunctionArgs) {
+  let cacheKey = `all-behaviors`
+  let cached = await localforage.getItem(cacheKey)
+  if (cached) { return { data: cached.data, goalData: cached.goalData }}
+
+  const { data } = await serverLoader();
+  localforage.setItem(cacheKey, { data })
+  return { data } 
 }
 
 export default function Calendar() {
@@ -36,9 +45,8 @@ export default function Calendar() {
   const navigation = useNavigation();
 
   // get data from loader, log any errors
-  const { data, error, goalData, errorMsg } = useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
-  console.log('ERROR MSG', errorMsg)
 
   // get params and search params from url
   const params = useParams();
@@ -54,11 +62,6 @@ export default function Calendar() {
 
   // get today 
   const today = getDayOfYear(new Date());
-
-  // create goal options
-  const goalOptions = goalData?.map((goal) => {
-    return <option key={goal.id} value={goal.id}>{goal.goal}</option>
-  }) || null;
 
   return (
     <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">

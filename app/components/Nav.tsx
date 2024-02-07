@@ -1,8 +1,13 @@
-import { NavLink } from "@remix-run/react"
+import { NavLink } from "@remix-run/react";
+import type { HeaderContext } from "~/utils/types";
 
-let id = '5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0'
+type HeaderProps = {
+    user: HeaderContext;
+}
 
-export function Nav() {
+export const Nav: React.FC<HeaderProps> = ({ user }) => {
+    let id = user ? user.user.id : '';
+
     return (
         <nav className="h-16 grid grid-cols-4 bg-gray-700 text-white">
         

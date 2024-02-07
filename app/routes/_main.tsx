@@ -10,7 +10,6 @@ import type { HeaderContext } from "~/utils/types";
 export async function loader({request}: LoaderFunctionArgs) {
     let user = await readUserSession(request)
     if(!user){
-        console.log('no user in main layout')
         throw redirect('/login')
     }
     return {
@@ -20,11 +19,10 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export default function MainLayout() {
     const user = useLoaderData() as HeaderContext;
-    console.log('user in main layout', user);
     return (
         <>
             <Header user={user} />
-            <Nav />
+            <Nav user={user} />
             <main className="grid justify-items-center bg-gray-200 px-4">
                 <div className="max-w-[400px] min-w-[350px]">
                     <Outlet context={user} />

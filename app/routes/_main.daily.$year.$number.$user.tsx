@@ -1,8 +1,10 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, Link } from "@remix-run/react";
 import { getCountsByGoal, groupedByCategory } from "~/utils/data-parsers";
 import { getMonthDayYear, getDayOfYear } from "~/utils/date-helper";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,11 +23,20 @@ export async function loader({request, params}: LoaderFunctionArgs) {
   }
 }
 
+export async function clientLoader({ params, serverLoader }: ClientLoaderFunctionArgs) {
+  let cacheKey = `all-behaviors`
+  let cached = await localforage.getItem(cacheKey)
+  if (cached) { return { data: cached.data }}
+
+  const { data } = await serverLoader();
+  localforage.setItem(cacheKey, { data })
+  return { data } 
+}
+
 export default function DailyView() {
   const params = useParams();
   const { data, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
-  console.log(params)
 
   const behaviorCounts =  getCountsByGoal(data)
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
