@@ -16,6 +16,8 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+const categoryEquals = (category: string | null) => (day: any) => day.category === category;
+
 export async function loader({request}: LoaderFunctionArgs) {
   const url = new URL(request.url);
   const category = url.searchParams.get("category");
@@ -52,12 +54,27 @@ export default function Calendar() {
   const params = useParams();
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get('category')
+  console.log('Category Params', categoryParam)
+  console.log(params)
 
-  // convert data into an array that can be use to create a yearly calendar
+  // convert data into an array that can be use to create a yearly calendar based on completed behaviors
   const list = getBehaviorList(data)
   const sortedList = list ? list.sort((a, b) => new Date(a.activity_date).getTime() - new Date(b.activity_date).getTime()) : [];
-  const completedDayObjectList = getUniqueDayList(sortedList)
+  // const filteredCalendarList = sortedList.filter(categoryEquals(categoryParam))
+
+  let filteredCalendarList;
+
+  if (categoryParam === null) {
+    filteredCalendarList = sortedList;
+  } else {
+    filteredCalendarList = sortedList.filter(categoryEquals(categoryParam))
+  }
+
+  const completedDayObjectList = getUniqueDayList(filteredCalendarList)
   const completedDayOfYearList = completedDayObjectList.map(day => day.day_of_year)
+
+
+  // builds the full year data object
   const calendarData = createYearlyCalendar(completedDayOfYearList)
 
   // get today 
