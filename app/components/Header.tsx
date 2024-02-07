@@ -26,7 +26,7 @@ const LogInHeader = () => {
   }
 
 export const Header: React.FC<HeaderProps> = ({ user }) => {
-    console.log('USER IN HEADER', user);
+    console.log('THE USER', user)
     let id = user ? user.user.id : '';
     return (
         <div className="w-full h-full flex flex-col justify-between bg-red-200">

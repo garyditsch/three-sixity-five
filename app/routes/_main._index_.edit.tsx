@@ -35,12 +35,10 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
   export async function action({ request }: ActionFunctionArgs){
     const formData = await request.formData();
-    console.log('FORM DATA', formData)
     const userId = formData.get("user_id")
     const goal = formData.get("goal")
     const category = formData.get("category")
     const goalValue = formData.get("goalValue")
-    console.log('FORM INFO', goal, category, goalValue, userId)
 
     // TODO: create record in supabase function  
     const { supabase, headers } = await createSupabaseServerClient({request})
@@ -88,7 +86,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 export default function Index() {  
   const { data } = useLoaderData()
   const user = useOutletContext() as User;
-  console.log('ID IN INDEX', user);
   const goals = createGoalList(data, String(user.user.id))
 
   return (

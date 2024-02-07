@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Logout Success" },
-    { name: "description", content: "You have been logged out" },
+    { title: "Success!" },
+    { name: "description", content: "Successful Day" },
   ];
 };
 
@@ -19,6 +19,6 @@ export default function Index() {
   }, []);
 
   return (
-      <div className="text-center font-bold text-xl">Logout Successful</div>
+      <div className="text-center font-bold text-xl">You have been successful today!</div>
   );
 }

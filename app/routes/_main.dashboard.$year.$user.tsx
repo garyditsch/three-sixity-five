@@ -24,6 +24,7 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export default function Dashboard() {
   const { data, error } = useLoaderData<typeof loader>();
+  console.log('DATA', data)
   console.log('ERROR', error)
 
   const behaviorCountsByGoal =  getCountsByGoal(data)

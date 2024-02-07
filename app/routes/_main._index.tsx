@@ -96,7 +96,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 export default function Index() {  
   const { data } = useLoaderData()
   const user = useOutletContext() as User;
-  console.log('ID IN INDEX', user);
   const goals = createGoalList(data, String(user.user.id))
 
   return (

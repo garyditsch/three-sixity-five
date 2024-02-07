@@ -1,8 +1,10 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, useSearchParams, useNavigation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,6 +24,16 @@ export async function loader({request}: LoaderFunctionArgs) {
     category: category,
     error: error
   })
+}
+
+export async function clientLoader({ params, serverLoader }: ClientLoaderFunctionArgs) {
+  let cacheKey = `all-behaviors`
+  let cached = await localforage.getItem(cacheKey)
+  if (cached) { return { data: cached.data }}
+
+  const { data } = await serverLoader();
+  localforage.setItem(cacheKey, { data })
+  return { data } 
 }
 
 export default function YearlyList() {
