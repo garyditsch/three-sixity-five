@@ -58,7 +58,9 @@ export default function Calendar() {
   // get params and search params from url
   const params = useParams();
   const [searchParams] = useSearchParams();
-  const categoryParam = searchParams.get('goal_id')
+  const categoryParam = searchParams.get('category')
+  const goalParam = searchParams.get('goal_id')
+  console.log('GOAL PARAM', goalParam)
   console.log('CATEGORY PARAM', categoryParam)
   console.log('PARAMS', params)
 
@@ -70,10 +72,12 @@ export default function Calendar() {
   // filter the list based on the category param if filter is selected
   let filteredCalendarList;
 
-  if (categoryParam === null) {
+  if (categoryParam === null && goalParam === null) {
     filteredCalendarList = sortedList;
-  } else {
-    filteredCalendarList = sortedList.filter(goalEquals(categoryParam))
+  } else if (categoryParam !== null && goalParam === null) {
+    filteredCalendarList = sortedList.filter(categoryEquals(categoryParam))
+  } else if (categoryParam === null && goalParam !== null) {  
+    filteredCalendarList = sortedList.filter(goalEquals(goalParam))
   }
 
   // take filtered list and get unique day list
