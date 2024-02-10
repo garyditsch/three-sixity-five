@@ -1,8 +1,11 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
+import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueGoalList, getCountsByGoal, getCountsByCategory, groupedByCategory } from "~/utils/data-parsers";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,24 +15,34 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({request}: LoaderFunctionArgs) {
-  let category = null;
-  let goalId = null;
-  const { data, error } = await behaviorDataQuery(request, category, Number(goalId));
+  const { behaviorData, error } = await behaviorDataQuery(request);
 
-  return { 
-    data: data,
+  return json({ 
+    behaviorData: behaviorData,
     error: error
+  });
+}
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const behaviorCached = await localforage.getItem('behaviorData');
+  if (behaviorCached) {
+    return { behaviorData: behaviorCached }
   }
+
+  const serverData = await serverLoader();
+  localforage.setItem('behaviorData', serverData.behaviorData);
+  return {
+    behaviorData: serverData.behaviorData,
+  };
 }
 
 export default function Dashboard() {
-  const { data, error } = useLoaderData<typeof loader>();
-  console.log('DATA', data)
+  const { behaviorData, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
 
-  const behaviorCountsByGoal =  getCountsByGoal(data)
-  const behaviorCountsByCategory =  getCountsByCategory(data)
-  const grouped = groupedByCategory(data)
+  const behaviorCountsByGoal =  getCountsByGoal(behaviorData)
+  const behaviorCountsByCategory =  getCountsByCategory(behaviorData)
+  const grouped = groupedByCategory(behaviorData)
 
   Object.keys((grouped)).forEach((key) => {
     grouped[key] = getUniqueGoalList(grouped[key])

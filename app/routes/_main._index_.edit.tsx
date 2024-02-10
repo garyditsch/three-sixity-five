@@ -45,7 +45,6 @@ export async function loader({request, params}: LoaderFunctionArgs) {
     const { error } = await supabase
       .from('goals')
       .insert({ user_id: userId, goal: goal, category: category, value: goalValue})
-    console.log('ERROR', error)
     if(error){
       return json({error: error.message }, { headers, status: 401})
     }
