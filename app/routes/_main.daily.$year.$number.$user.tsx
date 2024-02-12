@@ -1,4 +1,5 @@
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, Link } from "@remix-run/react";
 import { getCountsByGoal, groupedByCategory } from "~/utils/data-parsers";
@@ -13,35 +14,37 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export async function loader({request, params}: LoaderFunctionArgs) {
-  let category = null;
-  let goalId = null;
-  const { data, error } = await behaviorDataQuery(request, category, Number(goalId));
-  return { 
-    data: data,
+export async function loader({request}: LoaderFunctionArgs) {
+  const { behaviorData, error } = await behaviorDataQuery(request);
+
+  return json({ 
+    behaviorData: behaviorData,
     error: error
-  }
+  });
 }
 
-export async function clientLoader({ params, serverLoader }: ClientLoaderFunctionArgs) {
-  let cacheKey = `all-behaviors`
-  let cached = await localforage.getItem(cacheKey)
-  if (cached) { return { data: cached.data }}
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const behaviorCached = await localforage.getItem('behaviorData');
+  if (behaviorCached) {
+    return { behaviorData: behaviorCached }
+  }
 
-  const { data } = await serverLoader();
-  localforage.setItem(cacheKey, { data })
-  return { data } 
+  const serverData = await serverLoader();
+  localforage.setItem('behaviorData', serverData.behaviorData);
+  return {
+    behaviorData: serverData.behaviorData,
+  };
 }
 
 export default function DailyView() {
   const params = useParams();
-  const { data, error } = useLoaderData<typeof loader>();
+  const { behaviorData, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
 
-  const behaviorCounts =  getCountsByGoal(data)
+  const behaviorCounts =  getCountsByGoal(behaviorData)
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
-  const todaysBehaviors = data?.filter((day) => {
+  const todaysBehaviors = behaviorData?.filter((day) => {
     const day_of_year = getDayOfYear(new Date(day.activity_date))
     if(String(day_of_year) === params.number){
         return day

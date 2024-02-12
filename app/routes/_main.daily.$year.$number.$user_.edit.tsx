@@ -18,8 +18,6 @@ export async function action({ request, params }: ActionFunctionArgs){
   const formData = await request.formData();
   const selected_goal = formData.get("goal")
   const today = getMonthDayYearTime(Number(params.number), Number(params.year))
-  console.log('User', params.user)
-  console.log('Goal', selected_goal)
 
   const { supabase, headers } = await createSupabaseServerClient({request})
   const { error } = await supabase

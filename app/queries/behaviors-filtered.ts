@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
-export const behaviorDataQuery = async (request: Request, category: string | null, goalId: number | null) => {
+export const behaviorDataQuery = async (request: Request) => {
     const { supabase } = await createSupabaseServerClient({request})
     let query = supabase
         .from('behaviors')
@@ -10,17 +10,11 @@ export const behaviorDataQuery = async (request: Request, category: string | nul
             id, goal, value, category
         )
         `)
-    if (category) {
-        query = query
-        .eq('goals.category', category)
-    }
-    if (goalId) { 
-        query = query
-        .eq('goals.id', goalId)
-    }
+        
+    console.log("Making a query to the database for behaviors.")
     const { data, error } = await query;
     return { 
-        data: data,
+        behaviorData: data,
         error: error
     }
 }
@@ -30,7 +24,7 @@ export const goalDataQuery = async (request: Request) => {
     let query = supabase
         .from('goals')
         .select()
-
+    console.log("Making a query to the database for goals.")
     const { data, error } = await query;
     return { 
         goalData: data,
