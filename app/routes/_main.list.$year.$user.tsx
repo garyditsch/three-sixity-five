@@ -1,8 +1,9 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
-import { useLoaderData, useParams, useSearchParams, useNavigation } from "@remix-run/react";
+import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
+import { GoalFilterLink } from "~/components/GoalFilterLink";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 import { getBehaviorList } from "~/utils/data-parsers";
 import localforage from "localforage";
@@ -45,6 +46,12 @@ export default function YearlyList() {
   console.log('ERROR', error)
   const navigation = useNavigation();
 
+  const location = useLocation();
+  console.log('LOCATION', location)
+  let pathname = location.pathname;
+  let search = location.search;
+
+
   // get params and search params from url
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -69,10 +76,11 @@ export default function YearlyList() {
   return (
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         {/* <!-- Container --> */}
-        <div className="w-full h-100 rounded-lg grid grid-cols-1 divide-y divide-slate-800 justify-items-start"> 
-          <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
+        <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
+          <GoalFilterLink pathname={pathname} search={search} />
+          <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           {filteredCalendarList.map((day: any) => {
-            return <div className={"w-full grid grid-cols-1 py-4"} key={day.id}>
+            return <div className={"w-full grid grid-cols-1 py-4 divide-y divide-slate-800"} key={day.id}>
               <div className="text-sm text-gray-800 font-semibold">
                 {new Date(day.activity_date).toString().split(' ').slice(1, 4).join(' ')}
               </div>

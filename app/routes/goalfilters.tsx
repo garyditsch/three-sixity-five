@@ -1,8 +1,9 @@
 import { json, redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { Form, useLoaderData, useLocation } from "@remix-run/react";
 import { goalDataQuery } from "~/queries/behaviors-filtered";
-
+import localforage from "localforage";
 
 export async function action({ request, params }: ActionFunctionArgs){
     const formData = await request.formData();
@@ -23,6 +24,20 @@ export async function loader({request}: LoaderFunctionArgs) {
       errorMsg: errorMsg,
     })
   }
+
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+    const goalCached = await localforage.getItem('goalData');
+    if (goalCached) {
+        return { goalData: goalCached }
+    }
+
+    const serverData = await serverLoader();
+    localforage.setItem('goalData', serverData.goalData);
+    return {
+        goalData: serverData.goalData
+    };
+}
 
 export default function CalendarGoalFilters() {   
     const location = useLocation();

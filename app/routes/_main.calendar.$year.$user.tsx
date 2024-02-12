@@ -1,9 +1,10 @@
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
-import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation, Link} from "@remix-run/react";
+import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
+import { GoalFilterLink } from "~/components/GoalFilterLink";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
@@ -97,13 +98,8 @@ export default function Calendar() {
     <>
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <div>
-            Goals: 
-            <Link to="/goalfilters" state={{ from: pathname, searching: search }} className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-500 text-white text-center`}>
-              <button>Filter by Goal</button>
-            </Link>
-          </div>
-          <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
+          <GoalFilterLink pathname={pathname} search={search} />
+          <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           <div className="text-lg font-bold">Today is day {today} of this year.</div>
           <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
         </div>
