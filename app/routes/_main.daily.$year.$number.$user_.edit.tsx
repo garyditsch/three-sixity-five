@@ -20,15 +20,15 @@ export async function action({ request, params }: ActionFunctionArgs){
   const today = getMonthDayYearTime(Number(params.number), Number(params.year))
 
   const { supabase, headers } = await createSupabaseServerClient({request})
-    const { error } = await supabase
-      .from('behaviors')
-      .insert({ user_id: params.user, goal_id: selected_goal, activity_date: today})
-    
-    if(error){
-      return json({error: error.message }, { headers, status: 401})
-    }
+  const { error } = await supabase
+    .from('behaviors')
+    .insert({ user_id: params.user, goal_id: selected_goal, activity_date: today})
+  
+  if(error){
+    return json({error: error.message }, { headers, status: 401})
+  }
 
-    return redirect(`/calendar/2024/${params.user}`, { headers });
+  return redirect(`/successful-update`, { headers });
 }
 
 export async function loader({request}: LoaderFunctionArgs) {

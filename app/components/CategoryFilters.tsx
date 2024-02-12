@@ -8,28 +8,35 @@ export function CategoryFilters({
   navigation,
   categoryParam,
   params,
+  pathname,
+  search
 }: {
   navigation?: Navigation;
   categoryParam: string | null;
-  params: Params
+  params: Params;
+  pathname: string;
+  search: string;
 }) {
+  console.log('NAVIGATION', navigation)
+  console.log('CATEGORY PARAM', categoryParam)
+  console.log('PARAMS', params)
+  console.log('PATHNAME', pathname)
+  console.log('SEARCH', search)
   return (
     <div className="w-full py-8 overflow-x-scroll">
       <Form className="flex justify-between">
-        {navigation?.state === 'loading' && navigation.location.search === '' ? <Link to={`/calendar/2024/${params.user}`} 
+        <div>Category:</div>
+        {navigation?.state === 'loading' && navigation.location.search === '' ? <Link to={pathname} 
             className="w-1/4 shrink-0 rounded-full text-xs font-bold py-1 px-2 text-center bg-gray-800  text-white"
           >
             Loading...
-          </Link>  : <Link to={`/calendar/2024/${params.user}`}  
+          </Link>  : <Link to={pathname} 
             className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 text-center ${categoryParam === null ? 'bg-gray-800  text-white': 
             'border-solid border-2 border-gray-800'}`}
           >
             All Cat
           </Link>
         }
-        <Link to={`/calendar/2024/${params.user}/goal-filters`} className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-500 text-white text-center`}>
-          <button>By Goal</button>
-        </Link>
         {navigation?.state === 'loading' && navigation.location.search === '?category=Fitness' ? <button 
             className="w-1/4 shrink-0  mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-800  text-white"
             name="category" value="Fitness">
