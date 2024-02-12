@@ -9,7 +9,7 @@ export async function action({ request, params }: ActionFunctionArgs){
     const goal_id = formData.get("goal_id")
     const fromURL = formData.get("from")
     if(goal_id && fromURL){
-        return redirect(`${fromURL}?goalId=${goal_id}`);
+        return redirect(`${fromURL}?goal_id=${goal_id}`);
     }   
     return null;
   }

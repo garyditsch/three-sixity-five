@@ -1,11 +1,9 @@
-import { useState } from "react";
 import { json } from "@remix-run/node";
 import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation, Link} from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
-// import { Modal } from "~/components/GoalFilterModal";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
@@ -50,8 +48,6 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 }
 
 export default function Calendar() {
-  // const [modalOpen, setModalOpen] = useState(false);
-
   // get navitation state
   const navigation = useNavigation();
   console.log('NAVIGATION', navigation)
@@ -63,9 +59,8 @@ export default function Calendar() {
 
 
   // get data from loader, log any errors
-  const { behaviorData, error, goalData, errorMsg } = useLoaderData<typeof loader>();
+  const { behaviorData, error } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
-  console.log('ERROR MSG', errorMsg)
 
   // get params and search params from url
   const params = useParams();
@@ -102,7 +97,12 @@ export default function Calendar() {
     <>
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <div><Link to="/goalfilters" state={{ from: pathname, searching: search }}>Goal Filters</Link></div>
+          <div>
+            Goals: 
+            <Link to="/goalfilters" state={{ from: pathname, searching: search }} className={`w-1/4 shrink-0 mx-2 rounded-full text-xs font-bold py-1 px-2 bg-gray-500 text-white text-center`}>
+              <button>Filter by Goal</button>
+            </Link>
+          </div>
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} />
           <div className="text-lg font-bold">Today is day {today} of this year.</div>
           <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
