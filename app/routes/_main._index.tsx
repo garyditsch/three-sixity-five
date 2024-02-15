@@ -3,6 +3,7 @@ import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@rem
 import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
+import { LinkButton } from "~/components/LinkButton";
 
 import type { User } from "~/utils/types";
 
@@ -48,7 +49,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
       return json({error: error.message }, { headers, status: 401})
     }
 
-    return redirect(`/calendar/2024/${userId}`, { headers });
+    return redirect(`/successful-update`, { headers });
   }
 
   const loggedToday = (data: any) => {
@@ -104,9 +105,7 @@ export default function Index() {
         <div className="mt-8 text-center font-medium text-xl text-gray-800">Log your activity today.</div>
         {goals}
       </div>
-      <div className="py-8">
-          <Link className="w-full p-2 bg-gray-800 text-white text-center rounded-md" to="/edit">Add Goal</Link>
-        </div>
+      <LinkButton label={'Add New Goal'} width={'w-2/4'} to={'/edit'} />
     </>
   );
 }

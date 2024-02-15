@@ -32,15 +32,13 @@ export async function action({ request, params }: ActionFunctionArgs){
 }
 
 export async function loader({request}: LoaderFunctionArgs) {
-  let category = null;
-  let goaldId = null;
-  const { data, error } = await behaviorDataQuery(request, category, goaldId);
+  const { behaviorData, error } = await behaviorDataQuery(request);
   const { goalData, errorMsg } = await goalDataQuery(request);
 
   return {
     goalData: goalData,
     errorMsg: errorMsg, 
-    data: data,
+    data: behaviorData,
     error: error
   }
 }
