@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getMonthDayYear, getMonthDayYearTime, getDayOfYear } from "~/utils/date-helper";
 import { groupedByCategory } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
+import { SubmitButton } from "~/components/SubmitButton";
 
 export const meta: MetaFunction = () => {
   return [
@@ -88,9 +89,7 @@ export default function DailyEdit() {
                 {goalOptions}
               </select>
             </div>
-            <div className="mt-4">
-              <button className="w-full p-2 bg-gray-800 text-white text-center rounded-md" type="submit">Submit</button>
-            </div>
+            <SubmitButton label={"Submit"} width={"w-full" }/>
           </Form>
         </div>
     </div>

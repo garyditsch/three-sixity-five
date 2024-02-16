@@ -4,6 +4,7 @@ import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { Form, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { goalDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
+import { SubmitButton } from "~/components/SubmitButton";
 
 export async function action({ request, params }: ActionFunctionArgs){
     const formData = await request.formData();
@@ -82,11 +83,7 @@ export default function CalendarGoalFilters() {
                     <input type="hidden" name="from" value={redirectURL} />             
                 
                 {/* <!--Footer--> */}
-                <div className="flex justify-end pt-2">
-                    <button type="submit" className="w-full p-2 bg-gray-800 text-white text-center rounded-md">
-                        Filter
-                    </button>
-                </div>
+                <SubmitButton label={"Filterr"} width={"w-full" }/>
                 </Form>
             </div>
         </div>

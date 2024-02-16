@@ -1,8 +1,8 @@
 import { json, redirect, type ActionFunctionArgs } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-
 import { validate } from "../utils/validate";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
+import { SubmitButton } from "~/components/SubmitButton";
 
 export const meta = () => {
     return [{title: "365 Login"}];
@@ -91,7 +91,7 @@ export default function Login() {
                                 focus:ring-2 focus:ring-inset focus:ring-brand-blue
                                 sm:text-sm sm:leading-6"
                             />
-                            <button type="submit">Submit</button>
+                            <SubmitButton label={"Login"} width={"w-full" }/>
                         </div>
                     </Form>
                 </div>
