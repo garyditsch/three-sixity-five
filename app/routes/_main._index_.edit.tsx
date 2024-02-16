@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 
 import type { User } from "~/utils/types";
+import { SubmitButton } from "~/components/SubmitButton";
 
 export const meta: MetaFunction = () => {
   return [
@@ -110,9 +111,7 @@ export default function Index() {
                         {goalCategories}
                     </select>
                 </div>
-                <div className="mt-4">
-                    <button className="w-full p-2 bg-gray-800 text-white text-center rounded-md" type="submit">Submit</button>
-                </div>
+                <SubmitButton label={"Submit"} width={"w-full" }/>
             </Form>
         </div>
     </>

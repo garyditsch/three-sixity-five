@@ -6,6 +6,7 @@ import { getCountsByGoal, groupedByCategory } from "~/utils/data-parsers";
 import { getMonthDayYear, getDayOfYear } from "~/utils/date-helper";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
+import { LinkButton } from "~/components/LinkButton";
 
 export const meta: MetaFunction = () => {
   return [
@@ -68,9 +69,7 @@ export default function DailyView() {
             </ul>
           </div>
         ))}
-        <div className="py-4">
-          <Link className="w-full p-2 bg-gray-800 text-white text-center rounded-md" to={`/daily/2024/${params.number}/${params.user}/edit`}>Add Behavior</Link>
-        </div>
+        <LinkButton label={'Add Behavior'} width={'w-2/4'} to={`/daily/2024/${params.number}/${params.user}/edit`} />
     </div>
   );
 }
