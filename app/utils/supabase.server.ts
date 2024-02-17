@@ -1,10 +1,10 @@
 import { createServerClient, parse, serialize } from '@supabase/ssr'
 
-export function createSupabaseServerClient({ request }: { request: Request }) {
+export async function createSupabaseServerClient({ request }: { request: Request }) {
     const cookies = parse(request.headers.get("Cookie") ?? "");
     const headers = new Headers();
   
-    const supabase = createServerClient(
+    const supabase = await createServerClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_ANON_KEY!,
       {

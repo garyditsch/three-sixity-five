@@ -17,7 +17,6 @@ export async function action({ request, params }: ActionFunctionArgs){
   }
 
 export async function loader({request}: LoaderFunctionArgs) {
-    // let user = await readUserSession(request)
     const { goalData, errorMsg } = await goalDataQuery(request);
   
     return json({ 

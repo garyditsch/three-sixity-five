@@ -19,7 +19,7 @@ export async function action({ request }: ActionFunctionArgs) {
         return { clientErrors };
     }
 
-    const {supabase, headers} = createSupabaseServerClient({request})
+    const {supabase, headers} = await createSupabaseServerClient({request})
 
     const { error } = await supabase.auth.signInWithPassword({
         email: email,

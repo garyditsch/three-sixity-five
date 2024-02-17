@@ -1,11 +1,13 @@
-import { useLoaderData, Form, useOutletContext, Link } from "@remix-run/react";
+import { useLoaderData, Form } from "@remix-run/react";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 import { LinkButton } from "~/components/LinkButton";
-
-import type { User } from "~/utils/types";
+import { goalDataQuery } from "~/queries/behaviors-filtered";
+import { readUserSession } from "~/utils/auth";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,27 +18,40 @@ export const meta: MetaFunction = () => {
 
 
 // the action here does not need activity date because db defaults to now(), unlike the daily edit logger which requires the date
-export async function loader({request, params}: LoaderFunctionArgs) {
-    const { supabase } = await createSupabaseServerClient({request})
+export async function loader({request}: LoaderFunctionArgs) {
+    let user = await readUserSession(request) 
+    const { goalData, goalError } = await goalDataQuery(request);
 
-    const { data: goalData, error: goalError } = await supabase
-      .from('goals')
-      .select(`
-        id, goal, value, category,
-        behaviors (
-          id, created_at, user_id, goal_id, activity_date
-        )
-      `)
+    return json({ 
+      user: user,
+      goalData: goalData,
+      goalError: goalError,
+    })
+}
 
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const goalCached = await localforage.getItem('goalData');
+  const userCached = await localforage.getItem('user');
+  if (goalCached) {
     return { 
-      data: goalData,
-      error: goalError, 
+      goalData: goalCached,
+      user: userCached
     }
   }
 
-  export async function action({ request }: ActionFunctionArgs){
+  const serverData = await serverLoader();
+  localforage.setItem('goalData', serverData.goalData);
+  localforage.setItem('user', serverData.user);
+  return {
+    goalData: serverData.goalData, 
+    user: serverData.user
+  };
+}
+
+export async function action({ request }: ActionFunctionArgs){
+    let user = await readUserSession(request) 
+    const userId = user.id
     const formData = await request.formData();
-    const userId = formData.get("user_id")
     const goalId = formData.get("goal_id")
 
     // TODO: create record in supabase function  
@@ -95,9 +110,8 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 
 export default function Index() {  
-  const { data } = useLoaderData()
-  const user = useOutletContext() as User;
-  const goals = createGoalList(data, String(user.user.id))
+  const { goalData, user } = useLoaderData<typeof loader>()
+  const goals = createGoalList(goalData, String(user.id))
 
   return (
     <>
