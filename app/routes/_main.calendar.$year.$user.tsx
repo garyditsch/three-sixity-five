@@ -9,6 +9,7 @@ import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
+import { readUserSession } from "~/utils/auth";
 
 export const meta: MetaFunction = () => {
   return [
@@ -21,13 +22,15 @@ const categoryEquals = (category: string | null) => (day: any) => day.category =
 const goalEquals = (goal_id: string | null) => (day: any) => String(day.goal_id) === String(goal_id);
 
 export async function loader({request}: LoaderFunctionArgs) {
+  let user = await readUserSession(request);
   const { behaviorData, error } = await behaviorDataQuery(request);
-  const { goalData, errorMsg } = await goalDataQuery(request);
+  const { goalData,goalError } = await goalDataQuery(request);
 
   return json({ 
+    user: user,
     behaviorData: behaviorData,
     goalData: goalData,
-    errorMsg: errorMsg,
+    goalError: goalError,
     error: error
   });
 }
@@ -35,16 +38,23 @@ export async function loader({request}: LoaderFunctionArgs) {
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   const behaviorCached = await localforage.getItem('behaviorData');
   const goalCached = await localforage.getItem('goalData');
+  const userCached = await localforage.getItem('user');
   if (behaviorCached && goalCached) {
-    return { behaviorData: behaviorCached, goalData: goalCached }
+    return { 
+      user: userCached,
+      behaviorData: behaviorCached, 
+      goalData: goalCached 
+    }
   }
 
   const serverData = await serverLoader();
   localforage.setItem('behaviorData', serverData.behaviorData);
   localforage.setItem('goalData', serverData.goalData);
+  localforage.setItem('user', serverData.user);
   return {
     behaviorData: serverData.behaviorData,
-    goalData: serverData.goalData
+    goalData: serverData.goalData,
+    user: serverData.user
   };
 }
 
@@ -60,7 +70,7 @@ export default function Calendar() {
 
 
   // get data from loader, log any errors
-  const { behaviorData, error } = useLoaderData<typeof loader>();
+  const { behaviorData, error, user } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
 
   // get params and search params from url
@@ -101,7 +111,7 @@ export default function Calendar() {
           <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           <div className="text-lg font-bold">Today is day {today} of this year.</div>
-          <YearlyCalendar yearlyCalendar={calendarData} today={today} user={params.user} />
+          <YearlyCalendar yearlyCalendar={calendarData} today={today} user={user.id} />
         </div>
       </div>
     </>
