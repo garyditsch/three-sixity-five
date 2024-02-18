@@ -1,7 +1,5 @@
 import { getDayOfYear, getDaysInYear } from "./date-helper";
 
-// CALENDER SCREEN FUNCTIONS
-
 // gets at unique arrary that filters out any repeating days of year for a logged behavior 
 // not double dipping on logged behaviors!
 export const getUniqueDayList = (list: Array<any>) => {
@@ -32,38 +30,6 @@ export const getBehaviorList = (data: Array<any> | null) => {
     })
     return fullList;
 }
-
-// CALENDAR SCREEN DATA RETURNS
-
-const getBehaviorListReturn = [
-    {
-        "created_at": "2024-01-01T18:27:05.000Z",
-        "day_of_year": 1,
-        "goal_id": 3,
-        "category": "Spiritual",
-        "id": 29,
-        "user": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0"
-    },
-    {
-        "created_at": "2024-01-01T22:00:10.000Z",
-        "day_of_year": 1,
-        "goal_id": 4,
-        "category": "Fitness",
-        "id": 27,
-        "user": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0"
-    },
-    {
-        "created_at": "2024-01-02T18:26:48.829Z",
-        "day_of_year": 2,
-        "goal_id": 3,
-        "category": "Spiritual",
-        "id": 28,
-        "user": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0"
-    },
-]
-
-// DASHBOARD SCREEN FUNCTIONS
-
 
 export const groupedByCategory = (data: any) => {
     const x = data.reduce((acc, day) => {
@@ -105,136 +71,6 @@ export const getUniqueGoalList = (data: any) => {
       return uniqueGoalList.has(item.goal_id) ? false : uniqueGoalList.set(item.goal_id, true);
     });
   };
-
-// DASHBOARD SCREEN DATA RETURNS
-
-// The return from the loader on the Dashboard screen. This returns the same thing that the Calendar loader does
-// The query can be pulled out into a shared query file and imported into both screens
-const behaviorFilteredQueryReturn = [
-    {
-        "id": 27,
-        "goal_id": 4,
-        "created_at": "2024-01-01T22:00:10+00:00",
-        "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-        "goals": {
-            "id": 4,
-            "goal": "Full body strength session",
-            "value": 75,
-            "category": "Fitness"
-        }
-    },
-    {
-        "id": 28,
-        "goal_id": 3,
-        "created_at": "2024-01-02T18:26:48.829375+00:00",
-        "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-        "goals": {
-            "id": 3,
-            "goal": "Daily Bible Reading",
-            "value": 365,
-            "category": "Spiritual"
-        }
-    },
-    {
-        "id": 31,
-        "goal_id": 3,
-        "created_at": "2024-01-03T21:50:08.729449+00:00",
-        "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-        "goals": {
-            "id": 3,
-            "goal": "Daily Bible Reading",
-            "value": 365,
-            "category": "Spiritual"
-        }
-    }
-]
-
-const finalGroupedOutput = {
-    "Fitness": [
-        {
-            "id": 27,
-            "goal_id": 4,
-            "created_at": "2024-01-01T22:00:10+00:00",
-            "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-            "goals": {
-                "id": 4,
-                "goal": "Full body strength session",
-                "value": 75,
-                "category": "Fitness"
-            }
-        },
-    ],
-    "Spiritual": [
-        {
-            "id": 28,
-            "goal_id": 3,
-            "created_at": "2024-01-02T18:26:48.829375+00:00",
-            "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-            "goals": {
-                "id": 3,
-                "goal": "Daily Bible Reading",
-                "value": 365,
-                "category": "Spiritual"
-            }
-        }
-    ]
-}
-
-const behaviorCountsByGoalReturn = {
-    "Full body strength session": 5,
-    "Daily Bible Reading": 20,
-    "Run": 8,
-    "Swim": 3,
-    "Walk 10k": 1
-}
-
-const behaviorCountsByCategoryReturn = {
-    "Fitness": 17,
-    "Spiritual": 20
-}
-
-const groupedByCategoryReturn = { 
-    "Fitness": [
-        {
-            "id": 27,
-            "goal_id": 4,
-            "created_at": "2024-01-01T22:00:10+00:00",
-            "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-            "goals": {
-                "id": 4,
-                "goal": "Full body strength session",
-                "value": 75,
-                "category": "Fitness"
-            }
-        },
-        {
-            "id": 32,
-            "goal_id": 6,
-            "created_at": "2024-01-03T23:25:25+00:00",
-            "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-            "goals": {
-                "id": 6,
-                "goal": "Run",
-                "value": 125,
-                "category": "Fitness"
-            }
-        },
-    ],
-    "Spiritual": [
-        {
-            "id": 28,
-            "goal_id": 3,
-            "created_at": "2024-01-02T18:26:48.829375+00:00",
-            "user_id": "5c6d1d41-f3e4-4e5d-b75e-9a21265e3da0",
-            "goals": {
-                "id": 3,
-                "goal": "Daily Bible Reading",
-                "value": 365,
-                "category": "Spiritual"
-            }
-        }
-    ]
-}
 
 export const createYearlyCalendar = (list: Array<any>) => {
   const year: object[] = [];
