@@ -1,11 +1,45 @@
 import { json, redirect } from "@remix-run/node";
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
-import { Form, useLoaderData, useLocation } from "@remix-run/react";
+import { Form, useLoaderData, useLocation, useNavigate } from "@remix-run/react";
 import { goalDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
+import { SubmitButton } from "~/components/SubmitButton";
+import { readUserSession } from "~/utils/auth";
 
-export async function action({ request, params }: ActionFunctionArgs){
+export async function loader({request}: LoaderFunctionArgs) {
+    const user = await readUserSession(request);
+    const { goalData, goalError } = await goalDataQuery(request);
+  
+    return json({ 
+      user: user,
+      goalData: goalData,
+      errorMsg: goalError,
+    })
+  }
+
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+    const goalCached = await localforage.getItem('goalData');
+    const userCached = await localforage.getItem('user');
+    if (goalCached) {
+        return { 
+            goalData: goalCached ,
+            user: userCached
+        }
+    }
+
+    const serverData = await serverLoader();
+    localforage.setItem('goalData', serverData.goalData);
+    localforage.setItem('user', serverData.user);
+    return {
+        goalData: serverData.goalData,
+        user: serverData.user
+    };
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+    const user = await readUserSession(request);
     const formData = await request.formData();
     const goal_id = formData.get("goal_id")
     const fromURL = formData.get("from")
@@ -13,40 +47,15 @@ export async function action({ request, params }: ActionFunctionArgs){
         return redirect(`${fromURL}?goal_id=${goal_id}`);
     }   
     return null;
-  }
-
-export async function loader({request}: LoaderFunctionArgs) {
-    // let user = await readUserSession(request)
-    const { goalData, errorMsg } = await goalDataQuery(request);
-  
-    return json({ 
-      goalData: goalData,
-      errorMsg: errorMsg,
-    })
-  }
-
-
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-    const goalCached = await localforage.getItem('goalData');
-    if (goalCached) {
-        return { goalData: goalCached }
-    }
-
-    const serverData = await serverLoader();
-    localforage.setItem('goalData', serverData.goalData);
-    return {
-        goalData: serverData.goalData
-    };
 }
 
 export default function CalendarGoalFilters() {   
     const location = useLocation();
-    console.log('LOCATION', location)
     const redirectURL = location.state?.from;
-    console.log('REDIRECT URL', redirectURL)
+    const navigate = useNavigate();
 
 
-    const { goalData, errorMsg } = useLoaderData<typeof loader>();
+    const { goalData, errorMsg, user } = useLoaderData<typeof loader>();
     console.log('ERROR MSG', errorMsg)
 
     // create goal options
@@ -61,10 +70,10 @@ export default function CalendarGoalFilters() {
 
         <div className="fixed max-w-[400px] min-w-[400px] h-2/3 z-50 overflow-y-auto bg-white rounded-lg">
             
-            <div className="absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-black text-sm z-50">
-            <svg className="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-                <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
-            </svg>
+            <div onClick={() => navigate(-1)} className="absolute top-0 right-0 cursor-pointer flex flex-col items-center mt-4 mr-4 text-black text-sm z-50">
+                <svg className="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M14.53 4.53l-1.06-1.06L9 7.94 4.53 3.47 3.47 4.53 7.94 9l-4.47 4.47 1.06 1.06L9 10.06l4.47 4.47 1.06-1.06L10.06 9z"></path>
+                </svg>
             </div>
 
             {/* <!-- Add margin if you want to see grey behind the modal--> */}
@@ -83,11 +92,7 @@ export default function CalendarGoalFilters() {
                     <input type="hidden" name="from" value={redirectURL} />             
                 
                 {/* <!--Footer--> */}
-                <div className="flex justify-end pt-2">
-                    <button type="submit" className="w-full p-2 bg-gray-800 text-white text-center rounded-md">
-                        Filter
-                    </button>
-                </div>
+                <SubmitButton label={"Filterr"} width={"w-full" }/>
                 </Form>
             </div>
         </div>

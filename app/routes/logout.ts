@@ -2,7 +2,7 @@ import { json, redirect, type ActionFunctionArgs } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-    const {supabase, headers} = createSupabaseServerClient({request})
+    const {supabase, headers} = await createSupabaseServerClient({request})
 
     const { error } = await supabase.auth.signOut()
 

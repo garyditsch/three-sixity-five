@@ -1,10 +1,15 @@
 import type { MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useParams, useLoaderData, Form  } from "@remix-run/react";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getMonthDayYear, getMonthDayYearTime, getDayOfYear } from "~/utils/date-helper";
 import { groupedByCategory } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
+import { SubmitButton } from "~/components/SubmitButton";
+import { readUserSession } from "~/utils/auth";
+import localforage from "localforage";
+
 
 export const meta: MetaFunction = () => {
   return [
@@ -13,8 +18,47 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function loader({request}: LoaderFunctionArgs) {
+  let user = await readUserSession(request);
+  const { behaviorData, error } = await behaviorDataQuery(request);
+  const { goalData, goalError } = await goalDataQuery(request);
+
+  return json({
+    user: user,
+    behaviorData: behaviorData,
+    error: error,
+    goalData: goalData,
+    goalError: goalError
+  });
+}
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const behaviorCached = await localforage.getItem('behaviorData');
+  const goalCached = await localforage.getItem('goalData');
+  const userCached = await localforage.getItem('user');
+  if (behaviorCached && goalCached) {
+    return { 
+      behaviorData: behaviorCached, 
+      goalData: goalCached,
+      user: userCached
+    }
+  }
+
+  const serverData = await serverLoader();
+  localforage.setItem('behaviorData', serverData.behaviorData);
+  localforage.setItem('goalData', serverData.goalData);
+  localforage.setItem('user', serverData.user);
+  return {
+    behaviorData: serverData.behaviorData,
+    goalData: serverData.goalData,
+    user: serverData.user
+  };
+}
+
 // the action here has to take in the activity date so it can log it on the correct day (unlike the daily logger)
 export async function action({ request, params }: ActionFunctionArgs){
+  let user = await readUserSession(request);
+  const user_id = user.id
   const formData = await request.formData();
   const selected_goal = formData.get("goal")
   const today = getMonthDayYearTime(Number(params.number), Number(params.year))
@@ -22,7 +66,7 @@ export async function action({ request, params }: ActionFunctionArgs){
   const { supabase, headers } = await createSupabaseServerClient({request})
   const { error } = await supabase
     .from('behaviors')
-    .insert({ user_id: params.user, goal_id: selected_goal, activity_date: today})
+    .insert({ user_id: user_id, goal_id: selected_goal, activity_date: today})
   
   if(error){
     return json({error: error.message }, { headers, status: 401})
@@ -31,29 +75,15 @@ export async function action({ request, params }: ActionFunctionArgs){
   return redirect(`/successful-update`, { headers });
 }
 
-export async function loader({request}: LoaderFunctionArgs) {
-  let category = null;
-  let goaldId = null;
-  const { data, error } = await behaviorDataQuery(request, category, goaldId);
-  const { goalData, errorMsg } = await goalDataQuery(request);
-
-  return {
-    goalData: goalData,
-    errorMsg: errorMsg, 
-    data: data,
-    error: error
-  }
-}
-
 export default function DailyEdit() {
-  const { data, error, goalData, errorMsg } = useLoaderData<typeof loader>();
+  const { behaviorData, error, goalData, goalError, user } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
-  console.log('ERROR MSG', errorMsg)
+  console.log('ERROR MSG', goalError)
   let params = useParams()
 
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
 
-  const todaysBehaviors = data?.filter((day) => {
+  const todaysBehaviors = behaviorData?.filter((day) => {
     const day_of_year = getDayOfYear(new Date(day.activity_date))
     if(String(day_of_year) === params.number){
         return day
@@ -90,9 +120,7 @@ export default function DailyEdit() {
                 {goalOptions}
               </select>
             </div>
-            <div className="mt-4">
-              <button className="w-full p-2 bg-gray-800 text-white text-center rounded-md" type="submit">Submit</button>
-            </div>
+            <SubmitButton label={"Submit"} width={"w-full" }/>
           </Form>
         </div>
     </div>

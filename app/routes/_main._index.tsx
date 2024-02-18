@@ -1,10 +1,13 @@
-import { useLoaderData, Form, useOutletContext, Link } from "@remix-run/react";
+import { useLoaderData, Form } from "@remix-run/react";
+import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import type {  MetaFunction, LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
-
-import type { User } from "~/utils/types";
+import { LinkButton } from "~/components/LinkButton";
+import { goalDataQuery } from "~/queries/behaviors-filtered";
+import { readUserSession } from "~/utils/auth";
+import localforage from "localforage";
 
 export const meta: MetaFunction = () => {
   return [
@@ -15,27 +18,40 @@ export const meta: MetaFunction = () => {
 
 
 // the action here does not need activity date because db defaults to now(), unlike the daily edit logger which requires the date
-export async function loader({request, params}: LoaderFunctionArgs) {
-    const { supabase } = await createSupabaseServerClient({request})
+export async function loader({request}: LoaderFunctionArgs) {
+    let user = await readUserSession(request) 
+    const { goalData, goalError } = await goalDataQuery(request);
 
-    const { data: goalData, error: goalError } = await supabase
-      .from('goals')
-      .select(`
-        id, goal, value, category,
-        behaviors (
-          id, created_at, user_id, goal_id, activity_date
-        )
-      `)
+    return json({ 
+      user: user,
+      goalData: goalData,
+      goalError: goalError,
+    })
+}
 
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+  const goalCached = await localforage.getItem('goalData');
+  const userCached = await localforage.getItem('user');
+  if (goalCached) {
     return { 
-      data: goalData,
-      error: goalError, 
+      goalData: goalCached,
+      user: userCached
     }
   }
 
-  export async function action({ request }: ActionFunctionArgs){
+  const serverData = await serverLoader();
+  localforage.setItem('goalData', serverData.goalData);
+  localforage.setItem('user', serverData.user);
+  return {
+    goalData: serverData.goalData, 
+    user: serverData.user
+  };
+}
+
+export async function action({ request }: ActionFunctionArgs){
+    let user = await readUserSession(request) 
+    const userId = user.id
     const formData = await request.formData();
-    const userId = formData.get("user_id")
     const goalId = formData.get("goal_id")
 
     // TODO: create record in supabase function  
@@ -48,7 +64,7 @@ export async function loader({request, params}: LoaderFunctionArgs) {
       return json({error: error.message }, { headers, status: 401})
     }
 
-    return redirect(`/calendar/2024/${userId}`, { headers });
+    return redirect(`/successful-update`, { headers });
   }
 
   const loggedToday = (data: any) => {
@@ -94,9 +110,8 @@ export async function loader({request, params}: LoaderFunctionArgs) {
 
 
 export default function Index() {  
-  const { data } = useLoaderData()
-  const user = useOutletContext() as User;
-  const goals = createGoalList(data, String(user.user.id))
+  const { goalData, user } = useLoaderData<typeof loader>()
+  const goals = createGoalList(goalData, String(user.id))
 
   return (
     <>
@@ -104,9 +119,7 @@ export default function Index() {
         <div className="mt-8 text-center font-medium text-xl text-gray-800">Log your activity today.</div>
         {goals}
       </div>
-      <div className="py-8">
-          <Link className="w-full p-2 bg-gray-800 text-white text-center rounded-md" to="/edit">Add Goal</Link>
-        </div>
+      <LinkButton label={'Add New Goal'} width={'w-2/4'} to={'/edit'} />
     </>
   );
 }

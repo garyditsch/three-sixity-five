@@ -23,11 +23,18 @@ export const goalDataQuery = async (request: Request) => {
     const { supabase } = await createSupabaseServerClient({request})
     let query = supabase
         .from('goals')
-        .select()
+        .select(`
+            id, goal, value, category,
+            behaviors (
+                id, created_at, user_id, goal_id, activity_date
+            )
+        `)
+
     console.log("Making a query to the database for goals.")
+
     const { data, error } = await query;
     return { 
         goalData: data,
-        errorMsg: error
+        goalError: error
     }
 }
