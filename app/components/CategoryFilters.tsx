@@ -14,18 +14,22 @@ import { AllIcon } from "~/assets/allcategory";
 // https://youtu.be/c_-b_isI4vg?si=aRq6FnNHE4bP_mJN&t=9882
 
 const categoryFilterItems = [
-  { categoryParams: 'Fitness', value: 'Fitness', IconComponent: FitnessIcon },
-  { categoryParams: 'Spiritual', value: 'Spiritual', IconComponent: SpiritualIcon },
-  { categoryParams: 'Mental', value: 'Mental', IconComponent: MentalIcon },
-  { categoryParams: 'Social', value: 'Social', IconComponent: SocialIcon },
-  { categoryParams: 'Purpose', value: 'Purpose', IconComponent: PurposeIcon },
+  { value: 'Fitness', IconComponent: FitnessIcon },
+  { value: 'Spiritual', IconComponent: SpiritualIcon },
+  { value: 'Mental', IconComponent: MentalIcon },
+  { value: 'Social', IconComponent: SocialIcon },
+  { value: 'Purpose', IconComponent: PurposeIcon },
 ]
 
-const filterMenu = categoryFilterItems.map((item) => {
-  return (
-    <FilterIcon key={item.value} value={item.value} categoryParam={item.categoryParams} IconComponent={item.IconComponent}/>
-  )
-})
+const goalsStartsWith = (search: string | null) => {
+  if (search === null) {
+    return null;
+  } else if (search.startsWith('?goal_id')){
+    return true;
+  } else {
+    return false;
+  }
+}
 
 export function CategoryFilters({
   navigation,
@@ -40,15 +44,17 @@ export function CategoryFilters({
   pathname: string;
   search: string;
 }) {
-  console.log('CATEGORY PARAM', categoryParam)
-  console.log('PARAMS', params)
-  console.log('PATHNAME', pathname)
-  console.log('SEARCH', search)
-  console.log('NAVIGATION', navigation)
+
+  const filterMenu = categoryFilterItems.map((item) => {
+    return (
+      <FilterIcon key={item.value} value={item.value} IconComponent={item.IconComponent} categoryParam={categoryParam}/>
+    )
+  })
+
   return (
     <div className="w-full py-8 overflow-x-scroll">
       <Form className="flex justify-between">
-      <div className="grid justify-self-center min-w-[100px]">
+      <div className={`grid justify-self-center min-w-[100px]  ${goalsStartsWith(search) ? 'after:h-1 after:bg-gray-800 after:w-2/4 after:justify-self-center' : ''} `}>
             <Link to="/goalfilters" state={{ from: pathname, searching: search }} className="grid justify-self-center">
                 <span className="grid justify-self-center">
                     <div className="grid justify-self-center">
@@ -58,7 +64,7 @@ export function CategoryFilters({
                 </span>
             </Link>
         </div>
-        <div className="grid justify-self-center min-w-[100px]">
+        <div className={`grid justify-self-center min-w-[100px]  ${categoryParam === null && search === '' ? 'after:h-1 after:bg-gray-800 after:w-2/4 after:justify-self-center' : ''} `}>
             <Link className="grid " to={pathname}>
                 <span className="grid justify-self-center">
                     <div className="grid justify-self-center">
