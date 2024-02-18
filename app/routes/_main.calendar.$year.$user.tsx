@@ -108,9 +108,8 @@ export default function Calendar() {
     <>
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
-          <div className="text-lg font-bold">Today is day {today} of this year.</div>
+          <div className="text-lg font-bold my-4">Today is day {today} of this year.</div>
           <YearlyCalendar yearlyCalendar={calendarData} today={today} user={user.id} />
         </div>
       </div>

@@ -85,7 +85,6 @@ export default function YearlyList() {
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           {filteredCalendarList?.map((day: any) => {
             return <div className={"w-full grid grid-cols-1 py-4 divide-y divide-slate-800"} key={day.id}>
