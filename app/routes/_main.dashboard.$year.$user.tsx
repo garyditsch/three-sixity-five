@@ -6,6 +6,7 @@ import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueGoalList, getCountsByGoal, getCountsByCategory, groupedByCategory } from "~/utils/data-parsers";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
+import { readUserSession } from "~/utils/auth";
 
 export const meta: MetaFunction = () => {
   return [
@@ -15,9 +16,11 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({request}: LoaderFunctionArgs) {
+  let user = await readUserSession(request);
   const { behaviorData, error } = await behaviorDataQuery(request);
 
   return json({ 
+    user: user,
     behaviorData: behaviorData,
     error: error
   });
@@ -25,19 +28,22 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   const behaviorCached = await localforage.getItem('behaviorData');
+  const userCached = await localforage.getItem('user');
   if (behaviorCached) {
     return { behaviorData: behaviorCached }
   }
 
   const serverData = await serverLoader();
   localforage.setItem('behaviorData', serverData.behaviorData);
+  localforage.setItem('user', serverData.user);
   return {
     behaviorData: serverData.behaviorData,
+    user: serverData.user
   };
 }
 
 export default function Dashboard() {
-  const { behaviorData, error } = useLoaderData<typeof loader>();
+  const { behaviorData, error, user } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
 
   const behaviorCountsByGoal =  getCountsByGoal(behaviorData)

@@ -1,4 +1,4 @@
-import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
 import { readUserSession } from "~/utils/auth";
 
 import { Outlet, useLoaderData } from "@remix-run/react";
@@ -9,9 +9,6 @@ import type { HeaderContext } from "~/utils/types";
 
 export async function loader({request}: LoaderFunctionArgs) {
     let user = await readUserSession(request)
-    if(!user){
-        throw redirect('/login')
-    }
     return {
         user
   }

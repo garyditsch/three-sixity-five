@@ -5,8 +5,41 @@ import { Form, useLoaderData, useLocation, useNavigate } from "@remix-run/react"
 import { goalDataQuery } from "~/queries/behaviors-filtered";
 import localforage from "localforage";
 import { SubmitButton } from "~/components/SubmitButton";
+import { readUserSession } from "~/utils/auth";
 
-export async function action({ request, params }: ActionFunctionArgs){
+export async function loader({request}: LoaderFunctionArgs) {
+    const user = await readUserSession(request);
+    const { goalData, goalError } = await goalDataQuery(request);
+  
+    return json({ 
+      user: user,
+      goalData: goalData,
+      errorMsg: goalError,
+    })
+  }
+
+
+export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
+    const goalCached = await localforage.getItem('goalData');
+    const userCached = await localforage.getItem('user');
+    if (goalCached) {
+        return { 
+            goalData: goalCached ,
+            user: userCached
+        }
+    }
+
+    const serverData = await serverLoader();
+    localforage.setItem('goalData', serverData.goalData);
+    localforage.setItem('user', serverData.user);
+    return {
+        goalData: serverData.goalData,
+        user: serverData.user
+    };
+}
+
+export async function action({ request }: ActionFunctionArgs) {
+    const user = await readUserSession(request);
     const formData = await request.formData();
     const goal_id = formData.get("goal_id")
     const fromURL = formData.get("from")
@@ -14,30 +47,6 @@ export async function action({ request, params }: ActionFunctionArgs){
         return redirect(`${fromURL}?goal_id=${goal_id}`);
     }   
     return null;
-  }
-
-export async function loader({request}: LoaderFunctionArgs) {
-    // let user = await readUserSession(request)
-    const { goalData, errorMsg } = await goalDataQuery(request);
-  
-    return json({ 
-      goalData: goalData,
-      errorMsg: errorMsg,
-    })
-  }
-
-
-export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
-    const goalCached = await localforage.getItem('goalData');
-    if (goalCached) {
-        return { goalData: goalCached }
-    }
-
-    const serverData = await serverLoader();
-    localforage.setItem('goalData', serverData.goalData);
-    return {
-        goalData: serverData.goalData
-    };
 }
 
 export default function CalendarGoalFilters() {   
@@ -46,7 +55,7 @@ export default function CalendarGoalFilters() {
     const navigate = useNavigate();
 
 
-    const { goalData, errorMsg } = useLoaderData<typeof loader>();
+    const { goalData, errorMsg, user } = useLoaderData<typeof loader>();
     console.log('ERROR MSG', errorMsg)
 
     // create goal options

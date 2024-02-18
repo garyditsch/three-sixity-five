@@ -8,9 +8,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export default function Index() {
-
-
+export default function Colors() {
   return (
     <main className="max-w-full h-full flex relative overflow-y-scroll bg-slate-100">
       <div className="w-full m-8">

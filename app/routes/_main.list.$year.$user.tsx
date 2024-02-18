@@ -19,9 +19,11 @@ const categoryEquals = (category: string | null) => (day: any) => day.category =
 const goalEquals = (goal_id: string | null) => (day: any) => String(day.goal_id) === String(goal_id);
 
 export async function loader({request}: LoaderFunctionArgs) {
+  const user = await readUserSession(request);
   const { behaviorData, error } = await behaviorDataQuery(request);
 
   return json({ 
+    user: user,
     behaviorData: behaviorData,
     error: error
   });
@@ -29,20 +31,26 @@ export async function loader({request}: LoaderFunctionArgs) {
 
 export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   const behaviorCached = await localforage.getItem('behaviorData');
+  const userCached = await localforage.getItem('user');
   if (behaviorCached) {
-    return { behaviorData: behaviorCached }
+    return { 
+      behaviorData: behaviorCached,
+      user: userCached
+    }
   }
 
   const serverData = await serverLoader();
   localforage.setItem('behaviorData', serverData.behaviorData);
+  localforage.setItem('user', serverData.user);
   return {
     behaviorData: serverData.behaviorData,
+    user: serverData.user
   };
 }
 
 export default function YearlyList() {
   // get data from loader, log any errors
-  const { behaviorData, error } = useLoaderData<typeof loader>();
+  const { behaviorData, error, user } = useLoaderData<typeof loader>();
   console.log('ERROR', error)
   const navigation = useNavigation();
 
@@ -79,7 +87,7 @@ export default function YearlyList() {
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
           <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
-          {filteredCalendarList.map((day: any) => {
+          {filteredCalendarList?.map((day: any) => {
             return <div className={"w-full grid grid-cols-1 py-4 divide-y divide-slate-800"} key={day.id}>
               <div className="text-sm text-gray-800 font-semibold">
                 {new Date(day.activity_date).toString().split(' ').slice(1, 4).join(' ')}
