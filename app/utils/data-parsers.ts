@@ -23,6 +23,7 @@ export const getBehaviorList = (data: Array<any> | null) => {
         activity_date: new Date(day.activity_date),
         day_of_year: getDayOfYear(new Date(day.activity_date)),
         goal_id: day.goals.id,
+        goal: day.goals.goal,
         category: day.goals.category,
         id: day.id,
         user: day.user_id,
