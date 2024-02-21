@@ -4,7 +4,6 @@ import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
-import { GoalFilterLink } from "~/components/GoalFilterLink";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
