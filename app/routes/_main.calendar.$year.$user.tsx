@@ -103,13 +103,16 @@ export default function Calendar() {
   // get today 
   const today = getDayOfYear(new Date());
 
+  // get year
+  const year = new Date().getFullYear();
+
   return (
     <>
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           <div className="text-lg font-bold my-4">Today is day {today} of this year.</div>
-          <YearlyCalendar yearlyCalendar={calendarData} today={today} user={user.id} />
+          <YearlyCalendar calendarData={calendarData} today={today} user={user.id} year={year} />
         </div>
       </div>
     </>
