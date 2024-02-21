@@ -63,6 +63,9 @@ export default function DailyView() {
   })
   const grouped = groupedByCategory(todaysBehaviors)
 
+  // get year
+  const year = new Date().getFullYear();
+
   return (
     <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="mt-4 text-2xl text-gray-800 border-b-2 border-gray-800">{selectedDay}</div>
@@ -78,7 +81,7 @@ export default function DailyView() {
             </ul>
           </div>
         ))}
-        <LinkButton label={'Add Behavior'} width={'w-2/4'} to={`/daily/2024/${params.number}/${params.user}/edit`} />
+        <LinkButton label={'Add Behavior'} width={'w-2/4'} to={`/daily/${year}/${params.number}/${params.user}/edit`} />
     </div>
   );
 }
