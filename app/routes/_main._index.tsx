@@ -77,23 +77,32 @@ export async function action({ request }: ActionFunctionArgs){
         let updatedLoggedDate = getDayOfYear(loggedDate)
         return updatedLoggedDate === selectedDay
     })
+    // console.log('x', x)
     return x
   }
 
   const isNotComplete = (data: any) => {
-    const happenedToday = loggedToday(data)
-    return happenedToday.length === 0
+    const goalCategory = data.category
+    const happenedToday = loggedToday(data.behaviors)
+    const todayCheck = happenedToday.length === 0
+    return {
+      todayCheck: todayCheck,
+      goalCategory: goalCategory
+    }
   }
 
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
+       console.log('goal', goal)
+        let complete = isNotComplete(goal)
+        console.log('complete', complete)
         return <li key={goal.id}>
                 <div className={"w-full grid grid-rows-3 grid-flow-col py-8 border-b-2 border-gray-300"} >
-                    <div className="col-span-2 text-md text-gray-800 font-semibold">{goal.goal}</div>
-                    <div className="col-span-2 text-sm text-gray-800">{goal.category}</div>
-                    <div className="col-span-2 text-sm text-gray-800">{goal.behaviors.length} of {goal.value}</div>
+                    <div className={complete.todayCheck ? 'col-span-2 text-md text-gray-800 font-semibold' : 'col-span-2 text-md text-green-600 font-semibold'}>{goal.goal}</div>
+                    <div className={complete.todayCheck ? 'col-span-2 text-sm text-gray-800' : 'col-span-2 text-sm text-green-600 font-semibold'}>{goal.category}</div>
+                    <div className={complete.todayCheck ? 'col-span-2 text-sm text-gray-800' : 'col-span-2 text-sm text-green-600 font-semibold'}>{goal.behaviors.length} of {goal.value}</div>
                     <div className="grid row-span-3 content-center justify-end">
-                        {isNotComplete(goal.behaviors) ? 
+                        {complete.todayCheck ? 
                           <Form method="post">
                               <input type="hidden" name="goal_id" value={goal.id} />
                               <button className="bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded" type="submit">Log</button>
