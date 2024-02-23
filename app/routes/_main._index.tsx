@@ -5,7 +5,8 @@ import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 import { LinkButton } from "~/components/LinkButton";
-import { goalDataQuery } from "~/queries/behaviors-filtered";
+import { goalDataQuery, behaviorDataQuery } from "~/queries/behaviors-filtered";
+import { getCountsByGoal } from "~/utils/data-parsers";
 import { readUserSession } from "~/utils/auth";
 import localforage from "localforage";
 
@@ -79,7 +80,6 @@ export async function action({ request }: ActionFunctionArgs){
     return x
   }
 
-
   const isNotComplete = (data: any) => {
     const happenedToday = loggedToday(data)
     return happenedToday.length === 0
@@ -91,7 +91,7 @@ export async function action({ request }: ActionFunctionArgs){
                 <div className={"w-full grid grid-rows-3 grid-flow-col py-8 border-b-2 border-gray-300"} >
                     <div className="col-span-2 text-md text-gray-800 font-semibold">{goal.goal}</div>
                     <div className="col-span-2 text-sm text-gray-800">{goal.category}</div>
-                    <div className="col-span-2 text-sm text-gray-800">xx of xx</div>
+                    <div className="col-span-2 text-sm text-gray-800">{goal.behaviors.length} of {goal.value}</div>
                     <div className="grid row-span-3 content-center justify-end">
                         {isNotComplete(goal.behaviors) ? 
                           <Form method="post">

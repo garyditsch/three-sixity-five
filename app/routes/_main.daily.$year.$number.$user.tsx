@@ -62,6 +62,7 @@ export default function DailyView() {
     return null;
   })
   const grouped = groupedByCategory(todaysBehaviors)
+  console.log('GROUPED', grouped)
 
   // get year
   const year = new Date().getFullYear();
