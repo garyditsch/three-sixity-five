@@ -5,7 +5,8 @@ import { json, redirect } from "@remix-run/node";
 import { createSupabaseServerClient } from "~/utils/supabase.server";
 import { getDayOfYear } from "~/utils/date-helper";
 import { LinkButton } from "~/components/LinkButton";
-import { goalDataQuery } from "~/queries/behaviors-filtered";
+import { goalDataQuery, behaviorDataQuery } from "~/queries/behaviors-filtered";
+import { getCountsByGoal } from "~/utils/data-parsers";
 import { readUserSession } from "~/utils/auth";
 import localforage from "localforage";
 
@@ -76,33 +77,44 @@ export async function action({ request }: ActionFunctionArgs){
         let updatedLoggedDate = getDayOfYear(loggedDate)
         return updatedLoggedDate === selectedDay
     })
+    // console.log('x', x)
     return x
   }
 
-
   const isNotComplete = (data: any) => {
-    const happenedToday = loggedToday(data)
-    return happenedToday.length === 0
+    const goalCategory = data.category
+    const happenedToday = loggedToday(data.behaviors)
+    const todayCheck = happenedToday.length === 0
+    return {
+      todayCheck: todayCheck,
+      goalCategory: goalCategory
+    }
   }
 
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
+       console.log('goal', goal)
+        let complete = isNotComplete(goal)
+        console.log('complete', complete)
         return <li key={goal.id}>
-                <div className="p-3.5 w-full grid grid-cols-2 items-center text-gray-800">
-                    <div>{goal.goal}</div>
-                    <div className="grid justify-end">
-                        {isNotComplete(goal.behaviors) ? <Form method="post">
-                            <input type="hidden" name="goal_id" value={goal.id} />
-                            <input type="hidden" name="user_id" value={id} />
-                            <button className="bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded" type="submit">Log Activity</button>
-                        </Form>: 'Already logged'}
+                <div className={"w-full grid grid-rows-3 grid-flow-col py-8 border-b-2 border-gray-300"} >
+                    <div className={complete.todayCheck ? 'col-span-2 text-md text-gray-800 font-semibold' : 'col-span-2 text-md text-green-600 font-semibold'}>{goal.goal}</div>
+                    <div className={complete.todayCheck ? 'col-span-2 text-sm text-gray-800' : 'col-span-2 text-sm text-green-600 font-semibold'}>{goal.category}</div>
+                    <div className={complete.todayCheck ? 'col-span-2 text-sm text-gray-800' : 'col-span-2 text-sm text-green-600 font-semibold'}>{goal.behaviors.length} of {goal.value}</div>
+                    <div className="grid row-span-3 content-center justify-end">
+                        {complete.todayCheck ? 
+                          <Form method="post">
+                              <input type="hidden" name="goal_id" value={goal.id} />
+                              <button className="bg-gray-800 hover:bg-gray-400 text-white font-bold py-2 px-4 rounded" type="submit">Log</button>
+                          </Form>: 
+                          <div className="text-green-600 font-bold text-xl">Success</div>
+                        }
                     </div>
-                    <div className="text-sm text-gray-800">{goal.category}</div><div></div>
                 </div>
             </li>        
     })
     return (
-        <ul className="mt-8 mx-auto text-left text-lg leading-none border-blue-200 divide-y divide-blue-200">
+        <ul className="mt-8 mx-auto text-left text-lg leading-none border-gray-300 divide-y divide-gray-300">
             {listItems}
         </ul>
     )

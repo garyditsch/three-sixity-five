@@ -4,7 +4,6 @@ import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
 import { YearlyCalendar } from "~/components/YearlyCalendar";
-import { GoalFilterLink } from "~/components/GoalFilterLink";
 import { getDayOfYear } from "~/utils/date-helper";
 import { getUniqueDayList, getBehaviorList, createYearlyCalendar } from "~/utils/data-parsers";
 import { behaviorDataQuery, goalDataQuery } from "~/queries/behaviors-filtered";
@@ -26,6 +25,7 @@ export async function loader({request}: LoaderFunctionArgs) {
   const { behaviorData, error } = await behaviorDataQuery(request);
   const { goalData,goalError } = await goalDataQuery(request);
 
+  console.log('BEHAVIOR DATA', behaviorData)
   return json({ 
     user: user,
     behaviorData: behaviorData,
@@ -104,14 +104,16 @@ export default function Calendar() {
   // get today 
   const today = getDayOfYear(new Date());
 
+  // get year
+  const year = new Date().getFullYear();
+
   return (
     <>
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
-          <div className="text-lg font-bold">Today is day {today} of this year.</div>
-          <YearlyCalendar yearlyCalendar={calendarData} today={today} user={user.id} />
+          <div className="text-lg font-bold my-4">Today is day {today} of this year.</div>
+          <YearlyCalendar calendarData={calendarData} today={today} user={user.id} year={year} />
         </div>
       </div>
     </>

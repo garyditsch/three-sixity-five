@@ -3,10 +3,15 @@ import type { MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import type { ClientLoaderFunctionArgs } from "@remix-run/react";
 import { useLoaderData, useParams, useSearchParams, useNavigation, useLocation } from "@remix-run/react";
 import { CategoryFilters } from "~/components/CategoryFilters";
-import { GoalFilterLink } from "~/components/GoalFilterLink";
 import { behaviorDataQuery } from "~/queries/behaviors-filtered";
 import { getBehaviorList } from "~/utils/data-parsers";
 import localforage from "localforage";
+import { readUserSession } from "~/utils/auth";
+import { FitnessIcon } from "../assets/fitness";
+import { MentalIcon } from "~/assets/mental";
+import { SpiritualIcon } from "~/assets/spiritual";
+import { SocialIcon } from "~/assets/social";
+import { PurposeIcon } from "~/assets/purpose";
 
 export const meta: MetaFunction = () => {
   return [
@@ -51,8 +56,27 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 export default function YearlyList() {
   // get data from loader, log any errors
   const { behaviorData, error, user } = useLoaderData<typeof loader>();
+  console.log('BEHAVIOR', behaviorData)
   console.log('ERROR', error)
   const navigation = useNavigation();
+
+  function CategoryIcon(category: string | null) {
+    console.log('CATEGORY', category)
+    switch (category) {
+      case 'Fitness':
+        return <FitnessIcon />;
+      case 'Spiritual':
+        return <SpiritualIcon />;
+      case 'Purpose':
+        return <PurposeIcon />;
+      case 'Mental':
+        return <MentalIcon />;
+      case 'Social':
+        return <SocialIcon />;
+      default:
+        return <FitnessIcon />;
+    }
+  }
 
   const location = useLocation();
   console.log('LOCATION', location)
@@ -68,6 +92,7 @@ export default function YearlyList() {
   
   // convert data to array to use for UI
   const list = getBehaviorList(behaviorData)
+  console.log('LIST', list)
   const sortedList = list ? list.sort((a, b) => new Date(b.activity_date).getTime() - new Date(a.activity_date).getTime()) : [];
 
   // filter the list based on the category param if filter is selected
@@ -85,14 +110,14 @@ export default function YearlyList() {
       <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         {/* <!-- Container --> */}
         <div className="w-full h-100 rounded-lg grid grid-cols-1 justify-items-start"> 
-          <GoalFilterLink pathname={pathname} search={search} />
           <CategoryFilters navigation={navigation} categoryParam={categoryParam} params={params} pathname={pathname} search={search}/>
           {filteredCalendarList?.map((day: any) => {
-            return <div className={"w-full grid grid-cols-1 py-4 divide-y divide-slate-800"} key={day.id}>
-              <div className="text-sm text-gray-800 font-semibold">
-                {new Date(day.activity_date).toString().split(' ').slice(1, 4).join(' ')}
+            return <div className={"w-full grid grid-rows-2 grid-flow-col py-4 border-b-2 border-gray-300"} key={day.id}>
+              <div className="grid row-span-2 content-center justify-items-center">{CategoryIcon(day.category)}</div>
+              <div className="col-span-2 text-sm text-gray-800 font-semibold">
+                {new Date(day.activity_date).toString().split(' ').slice(1, 4).join(' ')}, {day.category}
               </div>
-              <div className="text-md text-gray-800">{day.goal_id}, {day.category}</div>
+              <div className="col-span-2 text-md text-gray-800">{day.goal}</div>
             </div>
           })}
         </div>

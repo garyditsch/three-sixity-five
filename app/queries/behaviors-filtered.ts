@@ -38,3 +38,19 @@ export const goalDataQuery = async (request: Request) => {
         goalError: error
     }
 }
+
+
+export const noteDataQuery = async (request: Request) => {
+    const { supabase } = await createSupabaseServerClient({request})
+    let query = supabase
+        .from('notes')
+        .select()
+
+    console.log("Making a query to the database for notes.")
+
+    const { data, error } = await query;
+    return { 
+        noteData: data,
+        noteError: error
+    }
+}

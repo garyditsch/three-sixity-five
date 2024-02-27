@@ -57,6 +57,9 @@ export default function Dashboard() {
   // get today
   const today = getDayOfYear(new Date());
 
+  // get this year
+  const year = new Date().getFullYear();
+
   return (
     <div className="grid-flow-col auto-cols-auto gap-4 overflow-y-hidden">
         <div className="w-full h-100 rounded-lg grid grid-cols-1 gap-4 pb-8"> 
@@ -76,7 +79,7 @@ export default function Dashboard() {
                               <p className="text-3xl">{today - behaviorCountsByCategory[key]}</p>
                           </div>
                           <div className="flex w-full justify-end items-end p-2">
-                            <div className="text-xs text-right items-end">There are {366 - today} days left in 2024.</div>
+                            <div className="text-xs text-right items-end">There are {366 - today} days left in {year}.</div>
                           </div>
                         </div>
                     </div>
