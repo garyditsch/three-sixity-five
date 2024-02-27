@@ -14,7 +14,7 @@ export default function Index() {
   const navigate = useNavigate();
   useEffect(() => {
     localforage.clear().then(() => {
-      console.log('Database is now empty.');
+      console.log('IndexDB is now empty.');
     }).catch((err) => {
       console.log('localforage error', err);
     });

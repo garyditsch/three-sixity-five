@@ -25,6 +25,7 @@ export async function loader({request}: LoaderFunctionArgs) {
   const { behaviorData, error } = await behaviorDataQuery(request);
   const { goalData,goalError } = await goalDataQuery(request);
 
+  console.log('BEHAVIOR DATA', behaviorData)
   return json({ 
     user: user,
     behaviorData: behaviorData,
