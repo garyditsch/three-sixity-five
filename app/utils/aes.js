@@ -1,5 +1,5 @@
 import CryptoJs from 'crypto-js';
-import magicnotekey from 'magicnotekey';
+import magicnotekey from '../../magicnotekey.ts';
 
 const Encrypt = (note) => {
     return CryptoJs.AES.encrypt(note, magicnotekey).toString();
