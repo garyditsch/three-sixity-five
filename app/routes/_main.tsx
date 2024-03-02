@@ -25,6 +25,9 @@ export default function MainLayout() {
                     <Outlet context={user} />
                 </div>
             </main>
+            <footer className="grid w-full py-2 px-4 bg-gray-800 items-center justify-items-end text-white">
+                v. 1.0.0
+            </footer>
         </>
     )
 }
