@@ -9,8 +9,8 @@ import { behaviorDataQuery, goalDataQuery, noteDataQuery } from "~/queries/behav
 import { SubmitButton } from "~/components/SubmitButton";
 import { readUserSession } from "~/utils/auth";
 import localforage from "localforage";
-import { Encrypt, Decrypt } from "~/utils/aes";
 import { Note } from "~/components/Note";
+import CryptoJs from 'crypto-js';
 
 
 export const meta: MetaFunction = () => {
@@ -21,10 +21,24 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({request}: LoaderFunctionArgs) {
+  const magicnotekey =  process.env.MAGICNOTEKEY
   let user = await readUserSession(request);
   const { behaviorData, error } = await behaviorDataQuery(request);
   const { goalData, goalError } = await goalDataQuery(request);
   const { noteData, noteError } = await noteDataQuery(request);
+
+  // Need to decrpyt the notes data here
+  const Decrypt = (note: string) => {
+    return CryptoJs.AES.decrypt(note, magicnotekey).toString(CryptoJs.enc.Utf8);
+  }
+
+  const decryptedNotes = noteData?.map((note) => {
+    const decrypted_note = Decrypt(note.note)
+    return {
+      ...note,
+      note: decrypted_note
+    }
+  })
 
   return json({
     user: user,
@@ -32,7 +46,7 @@ export async function loader({request}: LoaderFunctionArgs) {
     error: error,
     goalData: goalData,
     goalError: goalError,
-    noteData: noteData,
+    noteData: decryptedNotes,
     noteError: noteError
   });
 }
@@ -56,6 +70,7 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   localforage.setItem('goalData', serverData.goalData);
   localforage.setItem('noteData', serverData.noteData);
   localforage.setItem('user', serverData.user);
+  console.log('note data from server on edit daily', serverData.noteData)
   return {
     behaviorData: serverData.behaviorData,
     goalData: serverData.goalData,
@@ -66,6 +81,7 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 
 // the action here has to take in the activity date so it can log it on the correct day (unlike the daily logger)
 export async function action({ request, params }: ActionFunctionArgs){
+  const magicnotekey =  process.env.MAGICNOTEKEY
   let user = await readUserSession(request);
   const user_id = user.id
   const { supabase, headers } = await createSupabaseServerClient({request})
@@ -88,17 +104,28 @@ export async function action({ request, params }: ActionFunctionArgs){
 
     case 'ADD-NOTE':
       const note = formData.get("note")
-      const encrypted_note = Encrypt(note)  
 
-      const { noteError } = await supabase
+      // need the note to be encrypted here with key
+      const Encrypt = (note:string | null) => {
+        return CryptoJs.AES.encrypt(note, magicnotekey).toString();
+      }
+
+      if (typeof note === 'string' || note === null) {
+        const encrypted_note = Encrypt(note) 
+
+        const { noteError } = await supabase
         .from('notes')
         .insert({ user_id: user_id, activity_date: today, note: encrypted_note})
       
-      if(noteError){
-        return json({error: noteError.message }, { headers, status: 401})
+        if(noteError){
+          return json({error: noteError.message }, { headers, status: 401})
+        }
+
+        return redirect(`/successful-update`, { headers });
+      } else {
+        return null;
       }
 
-      return redirect(`/successful-update`, { headers });
     default:
       return null;
   }
@@ -131,7 +158,6 @@ export default function DailyEdit() {
 
   const grouped = groupedByCategory(todaysBehaviors)
   
-
   const goalOptions = goalData?.map((goal) => {
     return <option key={goal.id} value={goal.id}>{goal.goal}</option>
   })

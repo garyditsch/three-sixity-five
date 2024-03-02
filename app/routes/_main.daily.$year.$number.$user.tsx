@@ -9,6 +9,7 @@ import localforage from "localforage";
 import { LinkButton } from "~/components/LinkButton";
 import { Note } from "~/components/Note";
 import { readUserSession } from "~/utils/auth";
+import CryptoJs from 'crypto-js';
 
 export const meta: MetaFunction = () => {
   return [
@@ -18,14 +19,28 @@ export const meta: MetaFunction = () => {
 };
 
 export async function loader({request}: LoaderFunctionArgs) {
+  const magicnotekey =  process.env.MAGICNOTEKEY
   let user = await readUserSession(request);
   const { behaviorData, error } = await behaviorDataQuery(request);
   const { noteData, noteError } = await noteDataQuery(request);
 
+  // Need to decrpyt the notes data here
+  const Decrypt = (note: string) => {
+    return CryptoJs.AES.decrypt(note, magicnotekey).toString(CryptoJs.enc.Utf8);
+  }
+
+  const decryptedNotes = noteData?.map((note) => {
+    const decrypted_note = Decrypt(note.note)
+    return {
+      ...note,
+      note: decrypted_note
+    }
+  })
+
   return json({ 
     user: user,
     behaviorData: behaviorData,
-    noteData: noteData,
+    noteData: decryptedNotes,
     noteError: noteError,
     error: error
   });
@@ -80,8 +95,6 @@ export default function DailyView() {
     }
     return null;
   })
-
-  console.log('TODAYS NOTES', todaysNotes)
 
   // get year
   const year = new Date().getFullYear();

@@ -56,12 +56,10 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
 export default function YearlyList() {
   // get data from loader, log any errors
   const { behaviorData, error, user } = useLoaderData<typeof loader>();
-  console.log('BEHAVIOR', behaviorData)
   console.log('ERROR', error)
   const navigation = useNavigation();
 
   function CategoryIcon(category: string | null) {
-    console.log('CATEGORY', category)
     switch (category) {
       case 'Fitness':
         return <FitnessIcon />;
@@ -79,7 +77,6 @@ export default function YearlyList() {
   }
 
   const location = useLocation();
-  console.log('LOCATION', location)
   let pathname = location.pathname;
   let search = location.search;
 
@@ -92,7 +89,6 @@ export default function YearlyList() {
   
   // convert data to array to use for UI
   const list = getBehaviorList(behaviorData)
-  console.log('LIST', list)
   const sortedList = list ? list.sort((a, b) => new Date(b.activity_date).getTime() - new Date(a.activity_date).getTime()) : [];
 
   // filter the list based on the category param if filter is selected

@@ -1,5 +1,3 @@
-import { Decrypt } from "~/utils/aes"
-
 type NoteProps = {
   note: Array<string> | null | undefined;
 }
@@ -9,7 +7,7 @@ const createNoteList = (data: any) => {
   const noteItems = data.map(( note: any ) => {
       return <li key={note.id}>
               <div className={"w-full"} >
-                <div className="text-gray-800 text-lg">{Decrypt(note.note)}</div>
+                <div className="text-gray-800 text-lg">{note.note}</div>
               </div>
           </li>        
   })

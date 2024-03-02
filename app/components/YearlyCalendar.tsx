@@ -11,7 +11,6 @@ export function YearlyCalendar({
     year: number,
     user: string | undefined
   }) {
-    console.log('TODAY>>>>', today)
     return (
         <div className="w-full grid grid-cols-7 gap-4 justify-items-center"> 
             {calendarData.map((day: any) => {
