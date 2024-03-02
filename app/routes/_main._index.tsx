@@ -77,7 +77,6 @@ export async function action({ request }: ActionFunctionArgs){
         let updatedLoggedDate = getDayOfYear(loggedDate)
         return updatedLoggedDate === selectedDay
     })
-    // console.log('x', x)
     return x
   }
 
@@ -93,9 +92,7 @@ export async function action({ request }: ActionFunctionArgs){
 
   const createGoalList = (data: any, id: string) => {
     const listItems = data.map(( goal: any ) => {
-       console.log('goal', goal)
         let complete = isNotComplete(goal)
-        console.log('complete', complete)
         return <li key={goal.id}>
                 <div className={"w-full grid grid-rows-3 grid-flow-col py-8 border-b-2 border-gray-300"} >
                     <div className={complete.todayCheck ? 'col-span-2 text-md text-gray-800 font-semibold' : 'col-span-2 text-md text-green-600 font-semibold'}>{goal.goal}</div>

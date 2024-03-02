@@ -6,7 +6,6 @@ export async function readUserSession(request: Request){
     const { supabase } = await createSupabaseServerClient({request});
     const result = await supabase.auth.getSession();
     const user = result.data.session?.user;
-    console.log('user---', user)
     if(!user){
         throw redirect('/login')
     }

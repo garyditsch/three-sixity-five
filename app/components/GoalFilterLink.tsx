@@ -1,8 +1,6 @@
 import { Link } from "@remix-run/react";
 
 export const GoalFilterLink = (pathname) => {
-  console.log('PATHNAME', pathname.pathname)
-  console.log('SEARCH', pathname.search)
   return (
     <div>
         Goals: 
