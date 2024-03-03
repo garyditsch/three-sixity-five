@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
-    "dev": "remix dev --manual",
+    "dev": "remix dev -c \"rdt-cjs-serve ./build/index.js\" --manual",
     "start": "remix-serve ./build/index.js",
     "typecheck": "tsc"
   },
@@ -33,6 +33,7 @@
     "concurrently": "^8.2.2",
     "eslint": "^8.38.0",
     "postcss": "^8.4.32",
+    "remix-development-tools": "^3.7.4",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.1.6"
   },

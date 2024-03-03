@@ -1,4 +1,5 @@
 import type { LinksFunction } from "@remix-run/node";
+import rdtStylesheet from "remix-development-tools/index.css";
 
 import {
   Links,
@@ -12,9 +13,11 @@ import stylesheet from "~/tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+
+  ...(process.env.NODE_ENV === "development" ? [{ rel: "stylesheet", href: rdtStylesheet }] : []),
 ];
 
-export default function App() {
+function App() {
   return (
     <html lang="en">
       <head className="h-screen">
@@ -32,3 +35,12 @@ export default function App() {
     </html>
   );
 }
+
+let AppExport = App;
+// This imports the dev tools only if you're in development
+if(process.env.NODE_ENV === 'development') { 
+  const { withDevTools } = await import("remix-development-tools"); 
+  AppExport = withDevTools(AppExport);
+}
+
+export default AppExport;
