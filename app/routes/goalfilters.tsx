@@ -38,6 +38,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
     };
 }
 
+clientLoader.hydrate = true;
+
 export async function action({ request }: ActionFunctionArgs) {
     const user = await readUserSession(request);
     const formData = await request.formData();

@@ -53,6 +53,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   };
 }
 
+clientLoader.hydrate = true;
+
 export default function YearlyList() {
   // get data from loader, log any errors
   const { behaviorData, error, user } = useLoaderData<typeof loader>();

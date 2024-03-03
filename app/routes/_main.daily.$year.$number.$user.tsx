@@ -69,6 +69,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   };
 }
 
+clientLoader.hydrate = true;
+
 export default function DailyView() {
   const params = useParams();
   const { behaviorData, error, noteData, noteError } = useLoaderData<typeof loader>();

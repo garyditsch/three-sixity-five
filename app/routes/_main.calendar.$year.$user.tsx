@@ -57,6 +57,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   };
 }
 
+clientLoader.hydrate = true;
+
 export default function Calendar() {
   // get navitation state
   const navigation = useNavigation();
