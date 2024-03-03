@@ -79,6 +79,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   };
 }
 
+clientLoader.hydrate = true;
+
 // the action here has to take in the activity date so it can log it on the correct day (unlike the daily logger)
 export async function action({ request, params }: ActionFunctionArgs){
   const magicnotekey =  process.env.MAGICNOTEKEY

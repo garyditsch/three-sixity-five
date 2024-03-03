@@ -49,6 +49,8 @@ export async function clientLoader({ serverLoader }: ClientLoaderFunctionArgs) {
   };
 }
 
+clientLoader.hydrate = true;
+
 export async function action({ request }: ActionFunctionArgs){
     let user = await readUserSession(request) 
     const userId = user.id
