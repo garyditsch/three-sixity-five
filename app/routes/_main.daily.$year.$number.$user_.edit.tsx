@@ -141,6 +141,8 @@ export default function DailyEdit() {
   let params = useParams()
 
   const selectedDay = getMonthDayYear(Number(params.number), Number(params.year)).toString().split(' ').slice(0, 4).join(' ')
+  const today = getMonthDayYearTime(Number(params.number), Number(params.year))
+  console.log('TODAY on Local and Vercel', today)
 
   const todaysBehaviors = behaviorData?.filter((day) => {
     const day_of_year = getDayOfYear(new Date(day.activity_date))
