@@ -18,6 +18,7 @@ export function getDayOfYear(dateString: Date) {
 
 // getMonthDayYear function returns a date object with the day of week, month, day, year
 // Sun Jan 21 2024 00:00:00 GMT-0500 (Eastern Standard Time)
+// This returns the date object using the current browser timezone
 export const getMonthDayYear = (day: number, year: number) => {
   const date = new Date(year, 0); // initialize a date in `year-01-01`
   return new Date(date.setDate(day)); // add the number of days
@@ -27,11 +28,13 @@ export const getMonthDayYear = (day: number, year: number) => {
 export const getMonthDayYearTime = (day: number, year: number) => {
   const date = new Date(year, 0); // initialize a date in `year-01-01`
   const targetDate = new Date(date.setDate(day)); // add the number of days
-
   const now = new Date(); // get the current date and time
+
+  // const updatedMinutes = now.getMinutes() + now.getTimezoneOffset(); // get the current minutes and add the timezone offset
 
   // set the hours, minutes, seconds, and milliseconds of targetDate to the current time
   targetDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+  console.log('TARGET DATE', targetDate)
 
   return targetDate;
 }
