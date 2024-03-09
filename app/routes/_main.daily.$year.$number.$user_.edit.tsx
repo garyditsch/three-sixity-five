@@ -89,6 +89,7 @@ export async function action({ request, params }: ActionFunctionArgs){
   const { supabase, headers } = await createSupabaseServerClient({request})
 
   const today = getMonthDayYearTime(Number(params.number), Number(params.year))
+  console.log('TODAY on Local and Vercel', today)
   const formData = await request.formData();
 
   switch (formData.get("intent")) {
