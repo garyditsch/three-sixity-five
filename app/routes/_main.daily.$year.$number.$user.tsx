@@ -111,7 +111,7 @@ export default function DailyView() {
               {grouped[key].map((behavior: any) => (
                 <li key={behavior.id}>
                   {behavior.goals.goal}  <span className="text-xs">(  {behaviorCounts[behavior.goals.goal]} of {behavior.goals.value} )</span>
-                  {behavior.activity_date}
+                  {/* {behavior.activity_date} */}
                 </li>  
               ))}
             </ul>
